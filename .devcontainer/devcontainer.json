@@ -1,0 +1,40 @@
+{
+  "name": "SwiftRide (.NET 10)",
+  "dockerComposeFile": "compose.yaml",
+  "service": "workspace",
+  "workspaceFolder": "/workspaces/rite-lite",
+  "runServices": [
+    "workspace",
+    "sqlserver",
+    "mongodb",
+    "postgres",
+    "rabbitmq",
+    "otel-collector"
+  ],
+  "remoteUser": "vscode",
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [5000, 5001, 5002, 5003],
+  "portsAttributes": {
+    "5000": { "label": "API Gateway" },
+    "5001": { "label": "Trip Service" },
+    "5002": { "label": "Matching Service" },
+    "5003": { "label": "Payment Service" }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "fish",
+        "terminal.integrated.profiles.linux": {
+          "fish": { "path": "/usr/bin/fish" }
+        }
+      },
+      "extensions": [
+        "ms-dotnettools.csdevkit",
+        "ms-azuretools.vscode-containers",
+        "ms-mssql.mssql",
+        "mongodb.mongodb-vscode",
+        "ms-ossdata.vscode-pgsql"
+      ]
+    }
+  }
+}

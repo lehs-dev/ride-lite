@@ -1,0 +1,5 @@
+.devcontainer/.env
+**/bin/
+**/obj/
+.vs/
+.vscode/
