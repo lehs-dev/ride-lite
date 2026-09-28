@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     command: sleep infinity
     volumes:
-      - ..:/workspaces/rite-lite:cached
+      - ${LOCAL_WORKSPACE_FOLDER:-..}:/workspaces/rite-lite:cached
     environment:
       DOTNET_CLI_TELEMETRY_OPTOUT: "1"
       DOTNET_NOLOGO: "1"
@@ -20,11 +20,16 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
     depends_on:
-      - sqlserver
-      - mongodb
-      - postgres
-      - rabbitmq
-      - otel-collector
+      sqlserver-init:
+        condition: service_completed_successfully
+      mongodb-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      otel-collector:
+        condition: service_started
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -37,6 +42,16 @@ services:
     volumes:
       - sqlserver_data:/var/opt/mssql
 
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    entrypoint: ["/bin/bash", "/tmp/init-sqlserver.sh"]
+    environment:
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .devcontainer/.env}"
+    volumes:
+      - ./init-sqlserver.sh:/tmp/init-sqlserver.sh:ro
+    depends_on:
+      - sqlserver
+
   mongodb:
     image: mongo:8.0.30-noble
     environment:
@@ -46,6 +61,16 @@ services:
       - "127.0.0.1:27017:27017"
     volumes:
       - mongodb_data:/data/db
+
+  mongodb-init:
+    image: mongo:8.0.30-noble
+    entrypoint: ["/bin/sh", "/tmp/init-mongodb.sh"]
+    environment:
+      MONGO_ROOT_PASSWORD: "${MONGO_ROOT_PASSWORD:?Set MONGO_ROOT_PASSWORD in .devcontainer/.env}"
+    volumes:
+      - ./init-mongodb.sh:/tmp/init-mongodb.sh:ro
+    depends_on:
+      - mongodb
 
   postgres:
     image: postgres:18.6

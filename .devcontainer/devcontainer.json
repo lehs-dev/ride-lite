@@ -12,6 +12,14 @@
     "otel-collector"
   ],
   "remoteUser": "vscode",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "dockerDashComposeVersion": "v2"
+    }
+  },
+  "remoteEnv": {
+    "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+  },
   "shutdownAction": "stopCompose",
   "forwardPorts": [5000, 5001, 5002, 5003],
   "portsAttributes": {

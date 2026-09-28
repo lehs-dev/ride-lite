@@ -32,7 +32,7 @@ Các service dự kiến dùng REST hoặc gRPC cho lời gọi đồng bộ và
 | OAuth 2.0/OpenID Connect, JWT Bearer | Thêm gói xác thực ASP.NET Core và cấu hình issuer/audience khi chọn nhà cung cấp danh tính |
 | xUnit, Moq | Thêm vào các test project khi tạo bài kiểm thử |
 | OpenTelemetry | Collector nhận OTLP gRPC/HTTP và in dữ liệu ra log; thêm các gói OpenTelemetry SDK/exporter vào ứng dụng khi triển khai instrumentation |
-| Docker Compose | `.devcontainer/compose.yaml` khởi chạy môi trường; terminal dùng Fish và Starship |
+| Docker Compose | `.devcontainer/compose.yaml` khởi chạy môi trường; Dev Container có Docker CLI/Compose để xem các container trên host; terminal dùng Fish và Starship |
 
 Các thư viện ứng dụng là **phụ thuộc NuGet của từng project**, nên chưa thể khai báo vào một project không tồn tại. Tài liệu không chỉ định framework cho Rider/Driver app hoặc identity provider, nên môi trường này chưa chọn thay bạn. Collector là đích nhận telemetry phục vụ phát triển, chưa có dashboard.
 
@@ -40,7 +40,7 @@ Các thư viện ứng dụng là **phụ thuộc NuGet của từng project**, 
 
 1. Cài Docker Engine hoặc Docker Desktop có Compose, VS Code và extension **Dev Containers**. Máy cần đủ RAM cho SQL Server cùng ba dịch vụ dữ liệu khác. Image SQL Server Linux của Microsoft chỉ được hỗ trợ trên host x86-64; máy ARM có thể không chạy được toàn bộ stack này.
 2. Khi dùng bản sao mới của thư mục, tạo `.devcontainer/.env` từ `.devcontainer/.env.example`, rồi đặt bốn mật khẩu riêng. Mật khẩu SQL Server cần từ 8 ký tự và ít nhất 3 nhóm trong chữ hoa, chữ thường, chữ số, ký hiệu. File `.env` được bỏ qua bởi Git. Trong workspace hiện tại, file này đã được tạo với mật khẩu ngẫu nhiên cho môi trường local.
-3. Mở thư mục bằng VS Code, chạy **Dev Containers: Reopen in Container**. Lần đầu Docker sẽ tải image và build container làm việc. Terminal mặc định là Fish với Starship.
+3. Mở thư mục bằng VS Code, chạy **Dev Containers: Reopen in Container**. Nếu bạn đã mở Dev Container trước khi Docker CLI được thêm vào cấu hình, chạy **Dev Containers: Rebuild Container**. Lần đầu Docker sẽ tải image và build container làm việc. Terminal mặc định là Fish với Starship.
 4. Trong terminal của devcontainer, kiểm tra công cụ:
 
    ```sh
@@ -49,7 +49,12 @@ Các thư viện ứng dụng là **phụ thuộc NuGet của từng project**, 
    fish --version
    starship --version
    protoc --version
+   docker version
+   docker compose version
+   docker compose -f .devcontainer/compose.yaml ps
    ```
+
+Docker trong Dev Container dùng [Docker Outside of Docker](https://github.com/devcontainers/features/blob/main/src/docker-outside-of-docker/README.md): CLI bên trong kết nối tới Docker daemon trên host qua socket. Các database là những container **cùng Compose project**, không phải tiến trình chạy bên trong container làm việc. Quyền truy cập socket cho phép quản lý container trên host, nên chỉ bật cấu hình này trên máy phát triển tin cậy.
 
 Có thể chạy môi trường bằng Compose mà không dùng VS Code:
 
@@ -58,7 +63,7 @@ docker compose -f .devcontainer/compose.yaml up -d --build
 docker compose -f .devcontainer/compose.yaml exec workspace fish
 ```
 
-Các lệnh Compose trên chạy trên máy host, từ thư mục gốc. Khi dừng, dùng `docker compose -f .devcontainer/compose.yaml down`; dữ liệu trong Docker volumes vẫn được giữ lại.
+Các lệnh Compose trên chạy từ thư mục gốc, trên host hoặc trong terminal của Dev Container sau khi rebuild. Khi chạy bên trong Dev Container, biến `LOCAL_WORKSPACE_FOLDER` giúp Compose dùng đúng đường dẫn bind mount trên host. Khi dừng, dùng `docker compose -f .devcontainer/compose.yaml down`; dữ liệu trong Docker volumes vẫn được giữ lại. Đóng Dev Container sẽ dừng Compose stack theo `shutdownAction: stopCompose`.
 
 ## Kết nối hạ tầng
 
@@ -73,7 +78,7 @@ Các lệnh Compose trên chạy trên máy host, từ thư mục gốc. Khi d�
 
 User MongoDB, PostgreSQL và RabbitMQ là `swiftdev`; user SQL Server là `sa`. Mật khẩu nằm trong `.devcontainer/.env`. Container làm việc đã có biến `ConnectionStrings__TripDb`, `ConnectionStrings__MatchingDb`, `ConnectionStrings__PaymentDb`, `RabbitMq__Host`, `RabbitMq__UserName`, `RabbitMq__Password` và `OTEL_EXPORTER_OTLP_ENDPOINT` để các service ASP.NET Core có thể đọc khi được tạo. SQL Server dùng chứng chỉ tự ký trong môi trường local nên connection string phát triển có `TrustServerCertificate=True`.
 
-`PayDB` được PostgreSQL tạo lúc khởi động. MongoDB tạo `MatchDB` khi ghi dữ liệu lần đầu. `TripDB` sẽ được EF Core tạo khi áp dụng migration đầu tiên; hiện chưa có migration. Các cổng host chỉ bind vào loopback. Nếu máy đã dùng một cổng trong bảng, đổi cổng phía trái trong `.devcontainer/compose.yaml` hoặc tắt dịch vụ trùng cổng.
+`PayDB` được PostgreSQL tạo lúc khởi động. Hai tác vụ khởi tạo một lần trong Compose tạo `TripDB` trên SQL Server và `MatchDB` trên MongoDB trước khi container làm việc mở; `MatchDB` có collection đánh dấu `__devcontainer_init` để MongoDB giữ database rỗng về nghiệp vụ. Các tác vụ `sqlserver-init` và `mongodb-init` kết thúc với mã `0` là bình thường. Chưa có bảng, collection nghiệp vụ hoặc migration của ứng dụng. Các cổng host chỉ bind vào loopback. Nếu máy đã dùng một cổng trong bảng, đổi cổng phía trái trong `.devcontainer/compose.yaml` hoặc tắt dịch vụ trùng cổng.
 
 Để xem trạng thái và log:
 
