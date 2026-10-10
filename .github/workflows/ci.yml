@@ -20,10 +20,10 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore
-      - run: dotnet restore SwiftRide.sln
+        run: dotnet restore SwiftRide.sln
 
       - name: Build
-      - run: dotnet build SwiftRide.sln Release --no-restore
+        run: dotnet build SwiftRide.sln Release --no-restore
 
       - name: Test
-      - run: dotnet test SwiftRide.sln Release --no-build
+        run: dotnet test SwiftRide.sln Release --no-build
