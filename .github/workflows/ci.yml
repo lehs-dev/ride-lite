@@ -1,0 +1,29 @@
+name: LiteRide CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs: 
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with: 
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore SwiftRide.sln
+
+      - name: Build
+        run: dotnet build SwiftRide.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test SwiftRide.sln -c Release --no-build
