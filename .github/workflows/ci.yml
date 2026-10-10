@@ -23,7 +23,7 @@ jobs:
         run: dotnet restore SwiftRide.sln
 
       - name: Build
-        run: dotnet build SwiftRide.sln Release --no-restore
+        run: dotnet build SwiftRide.sln -c Release --no-restore
 
       - name: Test
-        run: dotnet test SwiftRide.sln Release --no-build
+        run: dotnet test SwiftRide.sln -c Release --no-build
