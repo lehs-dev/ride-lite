@@ -108,7 +108,8 @@ public class JwtTokenService : ITokenService
             ValidateLifetime = true,
             ClockSkew = TimeSpan.FromSeconds(30),
             NameClaimType = "name",
-            RoleClaimType = "role"
+            RoleClaimType = ClaimTypes.Role // "role" được inbound-map sang URI này khi validate
+
         };
 
         try
