@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Contracts\SwiftRide.Contracts.csproj" />
+    <ProjectReference Include="..\Security\SwiftRide.Security.csproj" />
   </ItemGroup>
 
   <ItemGroup>

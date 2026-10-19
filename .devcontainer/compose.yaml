@@ -14,6 +14,7 @@ services:
       ConnectionStrings__TripDb: "Server=sqlserver,1433;Database=TripDB;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .devcontainer/.env};Encrypt=True;TrustServerCertificate=True"
       ConnectionStrings__MatchingDb: "mongodb://swiftdev:${MONGO_ROOT_PASSWORD:?Set MONGO_ROOT_PASSWORD in .devcontainer/.env}@mongodb:27017/MatchDB?authSource=admin"
       ConnectionStrings__PaymentDb: "Host=postgres;Port=5432;Database=PayDB;Username=swiftdev;Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .devcontainer/.env}"
+      ConnectionStrings__IdentityDb: "Host=postgres;Port=5432;Database=IdentityDB;Username=swiftdev;Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .devcontainer/.env}"
       RabbitMq__Host: rabbitmq
       RabbitMq__UserName: swiftdev
       RabbitMq__Password: "${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in .devcontainer/.env}"
