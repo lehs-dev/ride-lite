@@ -1,0 +1,141 @@
+/* 1. Màu sắc và kiểu chữ dùng chung */
+:root {
+    color-scheme: light;
+    --page: #f5f7f2;
+    --ink: #203c30;
+    --text: #263b31;
+    --green: #367c50;
+    --lime: #d0f36d;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--text); -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible { outline: 3px solid #8db66b; outline-offset: 4px; }
+svg { display: block; }
+.page-shell { max-width: 1280px; min-height: 100svh; margin: 0 auto; padding: 0 64px; display: flex; flex-direction: column; }
+
+/* 2. Phần đầu trang */
+.site-header { min-height: 118px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--ink); font-size: 28px; font-weight: 750; letter-spacing: -1.4px; }
+.brand-mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 13px; background: var(--lime); }
+.brand-mark svg { width: 32px; height: 32px; }
+.brand-dot { color: var(--green); }
+.header-note { display: flex; align-items: center; gap: 9px; color: #727e6a; font-size: 12px; }
+.status-dot { width: 6px; height: 6px; flex: 0 0 6px; border-radius: 50%; background: #61945e; }
+
+/* 3. Giới thiệu và bản đồ minh họa */
+.login-layout { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 450px; align-items: center; gap: 86px; padding: 32px 0 48px; }
+.intro-panel { min-width: 0; }
+.eyebrow { display: flex; align-items: center; gap: 9px; margin: 0 0 20px; color: #6b7c60; font-size: 10px; font-weight: 700; letter-spacing: 2px; }
+.eyebrow > span { width: 20px; height: 2px; background: #7e9f63; }
+h1 { margin: 0; color: var(--ink); font-size: clamp(40px, 4.1vw, 54px); line-height: 1.2; font-weight: 650; letter-spacing: -2.5px; }
+h1 > span { color: var(--green); }
+.intro-description { margin: 20px 0 25px; font-size: 14px; line-height: 1.85; color: #737e6c; }
+.journey-scene { position: relative; height: 302px; margin: 0 -8px 0 -15px; border: 1px solid #e7ecdf; border-radius: 25px; overflow: hidden; background: #f0f3eb; }
+.city-map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.scene-label { position: absolute; z-index: 1; top: 17px; left: 19px; display: flex; align-items: center; gap: 7px; padding: 9px 11px; border: 1px solid #fff; border-radius: 8px; background: #fffffff0; color: #77816e; font-size: 8px; font-weight: 650; letter-spacing: 1px; }
+.destination-badge { position: absolute; z-index: 1; right: 15px; top: 111px; display: flex; align-items: center; gap: 8px; padding: 11px 12px; border: 1px solid #fff; border-radius: 11px; background: #fffffff5; box-shadow: 0 5px 20px #23442c08; }
+.badge-icon { display: grid; place-items: center; height: 29px; width: 29px; background: #eff7e3; color: #487c44; border-radius: 50%; }
+.badge-icon svg { width: 17px; height: 17px; }
+.destination-badge strong { display: block; color: #40523c; font-size: 10px; font-weight: 650; }
+.destination-badge div > span { display: block; margin-top: 3px; color: #85907c; font-size: 8px; }
+.trip-preview { position: absolute; z-index: 1; bottom: 27px; left: 17px; width: 265px; display: flex; gap: 12px; padding: 16px; border: 1px solid #fff; border-radius: 15px; background: #fffffff5; box-shadow: 0 9px 28px #25422e09; }
+.route-symbols { display: flex; flex-direction: column; align-items: center; width: 10px; margin: 10px 0; }
+.pickup-dot { width: 8px; height: 8px; border: 2px solid #769263; border-radius: 50%; }
+.route-line { flex: 1; width: 0; margin: 5px 0; border-left: 1px dashed #c3cbb9; }
+.destination-square { width: 7px; height: 7px; border: 2px solid #34593e; border-radius: 1px; }
+.route-addresses { flex: 1; min-width: 0; }
+.route-addresses > div + div { border-top: 1px solid #eef0e8; margin-top: 10px; padding-top: 10px; }
+.route-addresses span { display: block; margin-bottom: 4px; font-size: 7px; color: #8a9480; font-weight: 700; letter-spacing: 1.1px; }
+.route-addresses strong { display: block; font-size: 10px; font-weight: 600; }
+.route-arrow { color: #54714a; font-size: 16px; margin-top: 1px; }
+.map-caption { position: absolute; bottom: 10px; right: 15px; font-size: 6px; letter-spacing: 1.15px; font-weight: 650; color: #88977f; }
+.benefits { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 21px; color: #73806a; font-size: 10px; }
+.benefits > span { display: flex; align-items: center; gap: 4px; }
+.benefits svg { width: 15px; height: 15px; color: #769562; }
+
+/* 4. Thẻ đăng nhập */
+.login-card { background: #fff; border: 1px solid #e9ece5; border-radius: 25px; padding: 37px 36px 0; box-shadow: 0 16px 55px #2f4b3210, 0 2px 8px #2f4b3203; }
+.welcome-icon { display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 25px; border: 1px solid #e7eddf; border-radius: 14px; background: #f5f8ef; color: #4d6d3f; }
+.welcome-icon svg { width: 25px; height: 25px; }
+.card-eyebrow { margin: 0 0 9px; color: #76816c; font-size: 10px; font-weight: 650; letter-spacing: 1.8px; }
+h2 { margin: 0; font-size: 30px; line-height: 1.3; font-weight: 650; letter-spacing: -1px; color: #263b30; }
+h2 > span { color: #77a343; }
+.card-description { margin: 12px 0 30px; font-size: 13px; line-height: 1.7; color: #788170; }
+.field-group + .field-group { margin-top: 21px; }
+.field-group > label { display: block; margin-bottom: 9px; color: #465141; font-size: 13px; font-weight: 600; }
+.input-wrapper { display: flex; align-items: center; gap: 11px; height: 52px; padding: 0 15px; border: 1px solid #e4e8df; border-radius: 10px; background: #fbfcf9; transition: border-color .18s, box-shadow .18s; }
+.input-wrapper:focus-within { border-color: #8cac70; box-shadow: 0 0 0 3px #8cac7017; background: #fff; }
+.input-wrapper > svg { width: 17px; height: 17px; color: #8a967d; flex-shrink: 0; }
+.input-wrapper > input { min-width: 0; width: 100%; height: 100%; border: 0; outline: none; border-radius: inherit; color: #31452f; font-size: 13px; background: transparent; }
+.input-wrapper > input::placeholder { color: #8d9783; opacity: 1; }
+.input-wrapper > input:focus-visible { outline: none; }
+.form-options { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 17px 0 25px; }
+.remember-option { display: flex; align-items: center; gap: 7px; color: #737f68; font-size: 11px; cursor: pointer; }
+.remember-option input { width: 14px; height: 14px; margin: 0; accent-color: var(--green); cursor: pointer; }
+.text-button { border: 0; padding: 3px 0; background: transparent; color: #547348; font-size: 11px; font-weight: 600; border-radius: 2px; }
+.text-button:hover { color: #25492e; text-decoration: underline; text-underline-offset: 3px; }
+.login-button { width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 14px; border: 1px solid #c5e75f; border-radius: 10px; background: var(--lime); color: #294623; font-size: 14px; font-weight: 650; box-shadow: 0 3px 0 #b7d95c1c; transition: background .18s, transform .18s; }
+.login-button svg { width: 18px; height: 18px; }
+.login-button:hover { background: #c6eb5a; }
+.login-button:active { transform: translateY(1px); }
+.form-message { margin: 16px 0 0; padding: 11px 13px; border: 1px solid #e1e8d5; border-radius: 8px; background: #f6f9f0; color: #44603b; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.form-message:empty { display: none; }
+.signup-prompt { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 25px 0 29px; color: #7b876e; font-size: 12px; }
+.signup-button { font-size: 12px; }
+.signup-button > span { margin-left: 3px; }
+.card-footer { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 18px 0; border-top: 1px solid #eff1eb; color: #849177; font-size: 10px; }
+.card-footer svg { width: 15px; height: 15px; color: #879a77; }
+
+/* 5. Chân trang */
+.site-footer { min-height: 69px; display: flex; align-items: center; justify-content: space-between; gap: 18px; border-top: 1px solid #e4e9df; font-size: 10px; color: #7c896f; }
+.language-label { display: inline-flex; align-items: center; gap: 6px; }
+.language-label svg { width: 14px; height: 14px; }
+
+/* 6. Điều chỉnh bố cục cho màn hình nhỏ */
+@media (min-width: 1500px) {
+    .login-layout { padding-top: 55px; padding-bottom: 70px; }
+}
+@media (max-width: 1100px) {
+    .page-shell { padding: 0 40px; }
+    .login-layout { grid-template-columns: minmax(0, 1fr) 410px; gap: 45px; }
+    .login-card { padding: 32px 28px 0; }
+    .benefits { gap: 10px; font-size: 9px; }
+    h1 { font-size: 44px; }
+    .destination-badge { top: 91px; right: 10px; }
+}
+@media (max-width: 850px) {
+    .page-shell { max-width: 650px; padding: 0 28px; }
+    .site-header { min-height: 100px; }
+    .login-layout { grid-template-columns: 1fr; gap: 32px; padding: 24px 0 40px; }
+    .intro-panel { text-align: center; }
+    .eyebrow { justify-content: center; margin-bottom: 14px; }
+    h1 { font-size: 42px; }
+    .intro-description { margin: 15px 0 0; font-size: 13px; }
+    .journey-scene, .benefits { display: none; }
+    .login-card { width: 100%; max-width: 450px; margin: 0 auto; padding: 30px 32px 0; }
+    .site-footer > span:nth-child(2) { display: none; }
+}
+@media (max-width: 480px) {
+    .page-shell { padding: 0 20px; }
+    .site-header { min-height: 85px; }
+    .brand { font-size: 25px; gap: 8px; }
+    .brand-mark { width: 35px; height: 35px; border-radius: 11px; }
+    .brand-mark svg { width: 28px; height: 28px; }
+    .header-note { display: none; }
+    .login-layout { gap: 27px; padding: 16px 0 30px; }
+    .eyebrow { font-size: 8px; letter-spacing: 1.6px; }
+    h1 { font-size: 36px; letter-spacing: -1.8px; }
+    .intro-description { font-size: 12px; line-height: 1.8; }
+    .login-card { padding: 27px 23px 0; border-radius: 21px; }
+    .welcome-icon { width: 41px; height: 41px; margin-bottom: 20px; }
+    h2 { font-size: 27px; }
+    .card-description { font-size: 12px; margin-bottom: 25px; }
+    .site-footer { min-height: 59px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; }
+}

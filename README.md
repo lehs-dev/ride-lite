@@ -58,11 +58,13 @@ Các service giao tiếp đồng bộ qua REST (thông qua Gateway) và bất đ
 | **Payment Service** | `payment-service:8080` | `127.0.0.1:5003` | Thanh toán và sổ cái |
 | **SQL Server (TripDB)** | `sqlserver:1433` | `127.0.0.1:1433` | User: `sa` |
 | **MongoDB (MatchDB)** | `mongodb:27017` | `127.0.0.1:27017` | User: `swiftdev` |
-| **PostgreSQL (PayDB)** | `postgres:5432` | `127.0.0.1:5432` | User: `swiftdev`, DB: `PayDB` |
+| **PostgreSQL (PayDB)** | `postgres:5432` | `127.0.0.1:${POSTGRES_HOST_PORT:-5432}` | User: `swiftdev`, DB: `PayDB` |
 | **RabbitMQ Management** | `rabbitmq:15672` | [http://localhost:15672](http://localhost:15672) | User: `swiftdev` |
 | **OTel Collector (gRPC/HTTP)** | `otel-collector:4317/4318` | `127.0.0.1:4317/4318` | Nhận OTLP spans & metrics |
 
 *Mật khẩu cơ sở dữ liệu và RabbitMQ được cấu hình trong `.devcontainer/.env`.*
+
+Nếu cổng `5432` trên máy đã được sử dụng, đặt `POSTGRES_HOST_PORT=15432` trong `.devcontainer/.env`. Khi kết nối từ Windows, dùng `localhost:15432`; kết nối giữa các container vẫn dùng `postgres:5432`.
 
 ### Tài khoản người dùng mẫu có sẵn trong SQL Server
 

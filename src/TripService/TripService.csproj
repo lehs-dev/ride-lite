@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\Contracts\SwiftRide.Contracts.csproj" />
@@ -24,6 +24,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>eed93bf4-86c4-41fa-89dd-02243e20991f</UserSecretsId>
   </PropertyGroup>
 
 </Project>

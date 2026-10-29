@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f7f2">
+    <title>Đặt xe | SwiftRide</title>
+    <!-- Các thư viện bên ngoài, dùng để hiển thị bản đồ-->
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+        defer
+    ></script>
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    >
+    <link rel="stylesheet" href="home.css">
+    <script src="home.js" defer></script>
+</head>
+<body>
+    <!-- Các biểu tượng dùng chung, chỉ phục vụ hiển thị. -->
+    <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+        <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+        <symbol id="icon-location" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></symbol>
+        <symbol id="icon-history" viewBox="0 0 24 24"><path d="M3 11a9 9 0 1 1 2.6 7M3 5v6h6m3-4v5l3 2"/></symbol>
+        <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 21v-1a7 7 0 0 1 14 0v1"/></symbol>
+        <symbol id="icon-swap" viewBox="0 0 24 24"><path d="M8 3v16m-4-4 4 4 4-4M16 21V5m-4 4 4-4 4 4"/></symbol>
+        <symbol id="icon-car" viewBox="0 0 24 24"><path d="m5 8 2-5h10l2 5M4 9h16l1 4v6H3v-6l1-4Zm0 6h16M6 19v2m12-2v2M6 12h2m8 0h2"/></symbol>
+        <symbol id="icon-shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 5-8 10-8 10S4 17 4 12V6l8-3Z"/><path d="m8 12 3 3 5-6"/></symbol>
+        <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+        <symbol id="icon-route" viewBox="0 0 24 24"><circle cx="6" cy="5" r="3"/><circle cx="18" cy="19" r="3"/><path d="M6 8v5a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4V8"/></symbol>
+    </svg>
+
+    <header class="site-header">
+        <div class="brand" aria-label="SwiftRide">
+            <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M8 23 13 9h11l-5 14H8Z" fill="currentColor"/><path d="m16 11-3 7h5l-2 5 7-10h-6l1-2h-2Z" fill="#cef566"/></svg></span>
+            <span>swiftride<span class="brand-dot">.</span></span>
+        </div>
+
+        <nav class="primary-nav" aria-label="Điều hướng chính">
+            <span class="nav-item active" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#icon-car"/></svg>Đặt xe</span>
+            <button id="tripListButton" class="nav-item" type="button"><svg class="icon" aria-hidden="true"><use href="#icon-history"/></svg>Chuyến đi của tôi</button>
+        </nav>
+
+        <button id="accountButton" class="account-button" type="button" aria-label="Tài khoản hành khách">
+            <span class="avatar"><svg class="icon" aria-hidden="true"><use href="#icon-user"/></svg></span>
+            <span class="account-details"><span>Tài khoản của bạn</span><strong id="userName">Hành khách</strong></span>
+            <svg class="icon account-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+        </button>
+    </header>
+
+    <main class="booking-layout">
+        <!-- Bảng đặt xe. Các id được giữ rõ ràng để thêm logic theo từng bước. -->
+        <aside class="booking-sidebar" aria-label="Thông tin đặt xe">
+            <section id="bookingPanel" class="booking-card" aria-labelledby="booking-title">
+                <div class="card-heading">
+                    <p class="eyebrow"><span></span> MỖI CHUYẾN ĐI, MỘT KẾT NỐI</p>
+                    <h1 id="booking-title">Bạn muốn đi đâu<span>?</span></h1>
+                    <p>Chọn hành trình của bạn.<br>Để SwiftRide đồng hành.</p>
+                </div>
+
+                <ol class="booking-steps" aria-label="Các bước đặt xe">
+                    <li class="current" aria-current="step"><span>1</span>Hành trình</li>
+                    <li><span>2</span>Xác nhận giá</li>
+                    <li><span>3</span>Tìm tài xế</li>
+                </ol>
+
+                <div class="location-fields">
+                    <div class="field-group pickup-field">
+                        <label for="pickupAddress">Điểm đón</label>
+                        <div class="input-wrapper">
+                            <span class="pickup-symbol" aria-hidden="true"></span>
+                            <input id="pickupAddress" name="pickupAddress" type="text" placeholder="Nhập địa chỉ đón" autocomplete="off">
+                            <button id="currentLocationButton" class="input-icon-button" type="button" aria-label="Dùng vị trí hiện tại" title="Dùng vị trí hiện tại"><svg class="icon" aria-hidden="true"><use href="#icon-location"/></svg></button>
+                            <button id="pickupSearchButton" class="input-icon-button" type="button">Tìm</button>
+                        </div>
+                    </div>
+                    <div id="pickupSearchResults" aria-live="polite"></div>
+                    <div class="swap-row"><span></span><button id="swapLocationsButton" class="swap-button" type="button" aria-label="Đổi điểm đón và điểm đến" title="Đổi điểm đón và điểm đến"><svg class="icon" aria-hidden="true"><use href="#icon-swap"/></svg></button></div>
+
+                    <div class="field-group">
+                        <label for="destinationAddress">Điểm đến</label>
+                        <div class="input-wrapper">
+                            <span class="destination-symbol" aria-hidden="true"></span>
+                            <input id="destinationAddress" name="destinationAddress" type="text" placeholder="Bạn muốn đến đâu?" autocomplete="off">
+                        </div>
+                    </div>
+                    <button id="selectOnMapButton" class="map-select-button" type="button"><svg class="icon" aria-hidden="true"><use href="#icon-pin"/></svg>Chọn địa điểm trên bản đồ<svg class="icon small-arrow" aria-hidden="true"><use href="#icon-chevron"/></svg></button>
+                </div>
+
+                <div class="suggested-places" aria-label="Địa điểm gợi ý">
+                    <p class="section-label">GỢI Ý CHO HÀNH TRÌNH</p>
+                    <button class="place-button" type="button">
+                        <span class="place-icon"><svg class="icon" aria-hidden="true"><use href="#icon-pin"/></svg></span>
+                        <span><strong>Đại học Sài Gòn</strong><small>273 An Dương Vương, TP. Hồ Chí Minh</small></span>
+                        <svg class="icon place-chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+                    </button>
+                    <button class="place-button" type="button">
+                        <span class="place-icon"><svg class="icon" aria-hidden="true"><use href="#icon-pin"/></svg></span>
+                        <span><strong>Phố đi bộ Nguyễn Huệ</strong><small>Nguyễn Huệ, TP. Hồ Chí Minh</small></span>
+                        <svg class="icon place-chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+                    </button>
+                </div>
+
+                <div class="vehicle-card">
+                    <span class="vehicle-icon"><svg class="icon" aria-hidden="true"><use href="#icon-car"/></svg></span>
+                    <div><strong>SwiftRide Car</strong><span>Ô tô tiêu chuẩn · 4 chỗ</span></div>
+                    <span class="vehicle-check" aria-label="Loại xe tiêu chuẩn"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span>
+                </div>
+
+                <button id="bookTripButton" class="primary-button" type="button"><span>Yêu cầu đặt xe</span><svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+                <p class="booking-note">Bạn sẽ được xem và xác nhận giá ở bước tiếp theo.</p>
+                <p id="tripMessage" class="trip-message" role="status" aria-live="polite"></p>
+            </section>
+
+            <div class="reassurance"><span><svg class="icon" aria-hidden="true"><use href="#icon-shield"/></svg></span><div><strong>An tâm trên từng chặng đường</strong><p>Theo dõi trạng thái chuyến đi ngay tại đây.</p></div></div>
+        </aside>
+
+        <!-- Bản đồ-->
+        <section id="map" class="map-panel" aria-label="Bản đồ minh họa khu vực TP. Hồ Chí Minh">
+            <div id="rideMap" class="live-map"></div>
+
+            <div class="map-topbar">
+                <span class="city-label"><svg class="icon" aria-hidden="true"><use href="#icon-pin"/></svg><span>TP. Hồ Chí Minh</span><span class="city-dot"></span></span>
+                <span class="map-status"><span></span>Hành trình của bạn</span>
+            </div>
+
+            <div class="map-center-message">
+                <span class="journey-mark"><svg class="icon" aria-hidden="true"><use href="#icon-route"/></svg></span>
+                <strong>Một điểm đến mới đang chờ.</strong>
+                <span>Chọn điểm đón và điểm đến để bắt đầu hành trình.</span>
+            </div>
+
+            <div class="map-controls" aria-label="Điều khiển bản đồ">
+                <button id="zoomInButton" type="button" aria-label="Phóng to bản đồ">+</button>
+                <button id="zoomOutButton" type="button" aria-label="Thu nhỏ bản đồ">−</button>
+                <button id="centerMapButton" class="center-map-button" type="button" aria-label="Đưa bản đồ về vị trí trung tâm"><svg class="icon" aria-hidden="true"><use href="#icon-location"/></svg></button>
+            </div>
+
+            <div class="map-bottom-card"><span class="bottom-card-icon"><svg class="icon" aria-hidden="true"><use href="#icon-car"/></svg></span><div><strong>Đi đâu cũng gần. Có SwiftRide.</strong><span>Kết nối những hành trình, theo cách thật đơn giản.</span></div><span class="bottom-card-arrow" aria-hidden="true">↗</span></div>
+            <div class="map-footer"><span>Bản đồ minh họa · TP. Hồ Chí Minh</span><span>© 2026 SwiftRide</span></div>
+        </section>
+    </main>
+</body>
+</html>
