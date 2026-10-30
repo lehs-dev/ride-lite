@@ -10,7 +10,7 @@ public static class TripDbSeeder
     public static async Task SeedAsync(TripDbContext db)
     {
         // Tự động tạo schema bảng nếu chưa tồn tại
-        await db.Database.EnsureCreatedAsync();
+        // await db.Database.EnsureCreatedAsync();
 
         // 1. Seed Permissions
         var existingPermCodes = await db.Permissions.Select(p => p.Code).ToListAsync();
