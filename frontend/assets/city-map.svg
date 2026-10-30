@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1000" viewBox="0 0 1200 1000" fill="none">
+  <defs>
+    <pattern id="blocks" width="152" height="120" patternUnits="userSpaceOnUse" patternTransform="rotate(-22 600 500)">
+      <rect width="152" height="120" fill="#eaf0e5"/>
+      <rect x="8" y="8" width="129" height="97" rx="9" fill="#dce5d4"/>
+      <rect x="17" y="18" width="44" height="33" rx="5" fill="#e4ebde"/>
+      <rect x="70" y="18" width="57" height="33" rx="5" fill="#e4ebde"/>
+      <rect x="17" y="59" width="64" height="35" rx="5" fill="#e4ebde"/>
+      <rect x="90" y="59" width="37" height="35" rx="5" fill="#e4ebde"/>
+    </pattern>
+    <pattern id="park-lines" width="15" height="15" patternUnits="userSpaceOnUse"><path d="m0 15 15-15" stroke="#c4d8ae" stroke-width="1"/></pattern>
+    <linearGradient id="river" x1="900" y1="100" x2="1070" y2="1000" gradientUnits="userSpaceOnUse"><stop stop-color="#d5e9e4"/><stop offset="1" stop-color="#cde2dc"/></linearGradient>
+  </defs>
+  <rect width="1200" height="1000" fill="url(#blocks)"/>
+  <path d="M980-100C1065 100 830 142 924 312S1124 433 1010 600 973 805 1145 1100" stroke="#c5dccc" stroke-width="120"/>
+  <path d="M980-100C1065 100 830 142 924 312S1124 433 1010 600 973 805 1145 1100" stroke="url(#river)" stroke-width="104"/>
+  <path d="M980-100C1065 100 830 142 924 312S1124 433 1010 600 973 805 1145 1100" stroke="#e1eeea" stroke-width="1.5" stroke-dasharray="10 10"/>
+  <g transform="rotate(-22 600 500)">
+    <rect x="166" y="159" width="170" height="152" rx="16" fill="#d0dfbc"/>
+    <rect x="166" y="159" width="170" height="152" rx="16" fill="url(#park-lines)"/>
+    <path d="m188 289 124-106M190 182l122 105" stroke="#e5eddb" stroke-width="8"/>
+    <g fill="#bcd1a5"><circle cx="197" cy="204" r="14"/><circle cx="222" cy="183" r="11"/><circle cx="197" cy="261" r="16"/><circle cx="292" cy="264" r="15"/><circle cx="306" cy="211" r="13"/><circle cx="263" cy="279" r="12"/></g>
+    <rect x="602" y="643" width="165" height="151" rx="17" fill="#cedfb8"/>
+    <rect x="602" y="643" width="165" height="151" rx="17" fill="url(#park-lines)"/>
+    <path d="M616 717h137M684 656v124" stroke="#e4edd9" stroke-width="8"/>
+    <g fill="#b9d09e"><circle cx="630" cy="672" r="11"/><circle cx="654" cy="680" r="15"/><circle cx="735" cy="675" r="13"/><circle cx="737" cy="755" r="15"/><circle cx="626" cy="761" r="12"/><circle cx="651" cy="752" r="13"/></g>
+    <rect x="450" y="163" width="132" height="95" rx="12" fill="#e8e4d4"/>
+    <rect x="462" y="175" width="108" height="71" rx="6" fill="#efebdf"/>
+    <rect x="468" y="659" width="110" height="96" rx="12" fill="#e7e1d5"/>
+    <rect x="479" y="670" width="88" height="74" rx="5" fill="#efebe1"/>
+    <rect x="164" y="638" width="129" height="92" rx="12" fill="#e4dfd3"/>
+    <rect x="175" y="649" width="107" height="70" rx="5" fill="#ece8de"/>
+  </g>
+  <g stroke="#fbfcf8" stroke-linecap="round">
+    <path d="M-160 320 1260-254" stroke-width="27"/>
+    <path d="M-130 550 1310-31" stroke-width="29"/>
+    <path d="M-100 780 1320 207" stroke-width="30"/>
+    <path d="M-80 1008 1320 442" stroke-width="29"/>
+    <path d="M145-160 640 1100" stroke-width="29"/>
+    <path d="M485-150 973 1090" stroke-width="27"/>
+    <path d="M769-170 1210 950" stroke-width="24"/>
+    <path d="M-100 917C91 794 99 739 263 693s271-46 397-163S866 441 1250 554" stroke-width="28"/>
+  </g>
+  <g stroke="#e0e7d8" stroke-width="1.4" stroke-dasharray="6 10" stroke-linecap="round">
+    <path d="M-160 320 1260-254M-130 550 1310-31M-100 780 1320 207M-80 1008 1320 442"/>
+    <path d="M145-160 640 1100M485-150 973 1090M769-170 1210 950"/>
+    <path d="M-100 917C91 794 99 739 263 693s271-46 397-163S866 441 1250 554"/>
+  </g>
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#99a78c" text-anchor="middle">
+    <text x="388" y="222" transform="rotate(-22 388 222)">Nguyễn Thị Minh Khai</text>
+    <text x="330" y="475" transform="rotate(-22 330 475)">Nguyễn Trãi</text>
+    <text x="675" y="584" transform="rotate(-22 675 584)">Trần Hưng Đạo</text>
+    <text x="811" y="762" transform="rotate(-22 811 762)">Võ Văn Kiệt</text>
+    <text x="387" y="674" transform="rotate(68 387 674)">An Dương Vương</text>
+    <text x="720" y="257" transform="rotate(68 720 257)">Nam Kỳ Khởi Nghĩa</text>
+    <text x="1030" y="357" transform="rotate(22 1030 357)" fill="#92b5a5" font-size="15" letter-spacing="2">SÔNG SÀI GÒN</text>
+  </g>
+  <g font-family="Segoe UI, Arial, sans-serif" fill="#a2b18e" font-size="16" font-weight="600" letter-spacing="4" text-anchor="middle">
+    <text x="485" y="122">QUẬN 3</text>
+    <text x="685" y="671">QUẬN 1</text>
+    <text x="152" y="775">QUẬN 5</text>
+  </g>
+  <g fill="#f8fbf2" stroke="#c9d8b9" stroke-width="1.5">
+    <circle cx="292" cy="277" r="12"/>
+    <circle cx="626" cy="785" r="12"/>
+    <circle cx="788" cy="447" r="12"/>
+  </g>
+  <g stroke="#96b17b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m288 278 4-6 4 6h-8Zm0 0v4h8v-4m-5 4v-3h2v3"/>
+    <path d="m622 787 4-7 4 7m-9-3h10m-9 5h8"/>
+    <path d="M784 444h8v7h-8v-7Zm4-3v3m-4 3h8"/>
+  </g>
+</svg>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f7f2">
+    <meta name="description" content="Đăng nhập SwiftRide để bắt đầu hành trình của bạn.">
+    <title>Đăng nhập | SwiftRide</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="login.js" defer></script>
+</head>
+<body>
+    <div class="page-shell">
+        <header class="site-header">
+            <div class="brand" aria-label="SwiftRide">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" fill="none">
+                        <path d="M8 23 13 9h11l-5 14H8Z" fill="currentColor"/>
+                        <path d="m16 11-3 7h5l-2 5 7-10h-6l1-2h-2Z" fill="#cef566"/>
+                    </svg>
+                </span>
+                <span>swiftride<span class="brand-dot">.</span></span>
+            </div>
+            <span class="header-note"><span class="status-dot"></span> An tâm trên mọi hành trình</span>
+        </header>
+
+        <main class="login-layout">
+            <!-- Giới thiệu ứng dụng và hình minh họa hành trình. -->
+            <section class="intro-panel" aria-labelledby="intro-title">
+                <p class="eyebrow"><span></span> DI CHUYỂN THÔNG MINH HƠN</p>
+                <h1 id="intro-title">Đi đâu cũng gần.<br>Có <span>SwiftRide.</span></h1>
+                <p class="intro-description">Một chuyến xe, thêm nhiều trải nghiệm.<br>Kết nối hành trình của bạn theo cách thật đơn giản.</p>
+
+                <div class="journey-scene" role="img" aria-label="Minh họa chiếc xe SwiftRide trên hành trình từ Đại học Sài Gòn đến Phố đi bộ Nguyễn Huệ.">
+                    <div class="scene-label"><span class="status-dot"></span> THÀNH PHỐ TRONG TẦM TAY</div>
+                    <svg class="city-map" viewBox="0 0 580 330" fill="none" aria-hidden="true">
+                        <defs>
+                            <pattern id="city-blocks" width="105" height="83" patternUnits="userSpaceOnUse" patternTransform="rotate(-18 290 165)">
+                                <rect x="7" y="7" width="82" height="60" rx="10" fill="#e2e8dd"/>
+                                <rect x="15" y="15" width="28" height="44" rx="5" fill="#ecf0e8"/>
+                                <rect x="50" y="15" width="31" height="18" rx="4" fill="#ecf0e8"/>
+                                <rect x="50" y="39" width="31" height="20" rx="4" fill="#ecf0e8"/>
+                            </pattern>
+                            <filter id="pin-shadow" x="-100%" y="-100%" width="300%" height="300%">
+                                <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#183b28" flood-opacity=".15"/>
+                            </filter>
+                        </defs>
+                        <rect width="580" height="330" fill="#f0f3eb"/>
+                        <rect width="580" height="330" fill="url(#city-blocks)"/>
+                        <path d="M450-30C397 47 499 103 447 171S448 278 395 360" stroke="#d2e8dc" stroke-width="54"/>
+                        <path d="M450-30C397 47 499 103 447 171S448 278 395 360" stroke="#e5f2e9" stroke-width="29"/>
+                        <path d="m-20 188 620-202M-30 285 603 80M115-20l116 370M315-30l118 380" stroke="#fffefb" stroke-width="15"/>
+                        <path d="m-20 188 620-202M-30 285 603 80M115-20l116 370M315-30l118 380" stroke="#e1e6db" stroke-width="1" stroke-dasharray="4 7"/>
+                        <rect x="43" y="56" width="81" height="57" rx="17" transform="rotate(-18 43 56)" fill="#d5e5bc"/>
+                        <circle cx="74" cy="73" r="11" fill="#bed59d"/>
+                        <circle cx="95" cy="66" r="9" fill="#bed59d"/>
+                        <circle cx="91" cy="88" r="13" fill="#bed59d"/>
+                        <path d="m160 204 70-23a21 21 0 0 0 13-26l-6-18a18 18 0 0 1 12-23l119-39" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+                        <path d="m160 204 70-23a21 21 0 0 0 13-26l-6-18a18 18 0 0 1 12-23l119-39" stroke="#378052" stroke-width="5" stroke-linecap="round"/>
+                        <circle cx="160" cy="204" r="20" fill="#378052" fill-opacity=".12"/>
+                        <circle cx="160" cy="204" r="9" fill="#fff" stroke="#378052" stroke-width="4"/>
+                        <g filter="url(#pin-shadow)">
+                            <path d="M368 42c-14 0-25 11-25 25 0 19 25 38 25 38s25-19 25-38c0-14-11-25-25-25Z" fill="#244b38"/>
+                            <circle cx="368" cy="67" r="8" fill="#cef566"/>
+                        </g>
+                        <g transform="translate(268 108) rotate(-18)" filter="url(#pin-shadow)">
+                            <rect x="-27" y="-15" width="54" height="30" rx="11" fill="#244b38"/>
+                            <rect x="-9" y="-11" width="21" height="22" rx="6" fill="#cef566"/>
+                            <path d="m-11-9-6 2v14l6 2V-9Zm25 0 6 2v14l-6 2V-9Z" fill="#e5efdf"/>
+                            <path d="M-2-8v16" stroke="#b1d452" stroke-width="1.5"/>
+                            <rect x="23" y="-10" width="3" height="5" rx="1" fill="#f4efb4"/>
+                            <rect x="23" y="5" width="3" height="5" rx="1" fill="#f4efb4"/>
+                        </g>
+                    </svg>
+
+                    <div class="destination-badge">
+                        <span class="badge-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </span>
+                        <div><strong>Hành trình của riêng bạn</strong><span>Chọn điểm đến. Để SwiftRide đồng hành.</span></div>
+                    </div>
+                    <div class="trip-preview">
+                        <div class="route-symbols" aria-hidden="true"><span class="pickup-dot"></span><span class="route-line"></span><span class="destination-square"></span></div>
+                        <div class="route-addresses">
+                            <div><span>ĐIỂM ĐÓN</span><strong>Đại học Sài Gòn</strong></div>
+                            <div><span>ĐIỂM ĐẾN</span><strong>Phố đi bộ Nguyễn Huệ</strong></div>
+                        </div>
+                        <span class="route-arrow" aria-hidden="true">↗</span>
+                    </div>
+                    <span class="map-caption">MỖI ĐIỂM ĐẾN, MỘT KHỞI ĐẦU MỚI.</span>
+                </div>
+
+                <div class="benefits" aria-label="Trải nghiệm SwiftRide">
+                    <span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 10 3 3 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Đặt xe dễ dàng</span>
+                    <span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 10 3 3 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Theo dõi hành trình</span>
+                    <span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 10 3 3 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Thanh toán tiện lợi</span>
+                </div>
+            </section>
+
+            <!-- Giao diện đăng nhập. Giữ các id để tự bổ sung JavaScript ở bài học tiếp theo. -->
+            <section class="login-card" aria-labelledby="login-title">
+                <div class="welcome-icon" aria-hidden="true">
+                    <svg viewBox="0 0 28 28" fill="none"><path d="M5 15h17m-6-6 6 6-6 6M5 8V6a2 2 0 0 1 2-2h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <p class="card-eyebrow">CHÀO BẠN,</p>
+                <h2 id="login-title">Mừng bạn trở lại<span>.</span></h2>
+                <p class="card-description">Đăng nhập và bắt đầu hành trình tiếp theo.</p>
+
+                <div class="login-form" role="form" aria-label="Đăng nhập tài khoản SwiftRide">
+                    <div class="field-group">
+                        <label for="username">Tên đăng nhập</label>
+                        <div class="input-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M5 20v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                            <input id="username" name="username" type="text" placeholder="Nhập tên đăng nhập của bạn" autocomplete="username" autocapitalize="none" spellcheck="false">
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="password">Mật khẩu</label>
+                        <div class="input-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="15" r="1.3" fill="currentColor"/></svg>
+                            <input id="password" name="password" type="password" placeholder="Nhập mật khẩu" autocomplete="current-password">
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-option"><input id="rememberMe" type="checkbox"><span>Ghi nhớ đăng nhập</span></label>
+                        <button class="text-button" type="button">Quên mật khẩu?</button>
+                    </div>
+
+                    <button id="loginButton" class="login-button" type="button">
+                        <span>Đăng nhập</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <p id="message" class="form-message" role="status" aria-live="polite"></p>
+                </div>
+
+                <div class="signup-prompt">Chưa có tài khoản? <button class="text-button signup-button" type="button">Đăng ký ngay <span aria-hidden="true">↗</span></button></div>
+                <div class="card-footer">
+                    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m10 2 6 2.5v5c0 3.5-3.5 6.5-6 8-2.5-1.5-6-4.5-6-8v-5L10 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="m7 9.5 2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span>Một tài khoản. Kết nối mọi hành trình.</span>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <span>© 2026 SwiftRide</span>
+            <span>Di chuyển nhẹ nhàng. Sống trọn từng khoảnh khắc.</span>
+            <span class="language-label"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.3"/><ellipse cx="10" cy="10" rx="3" ry="7" stroke="currentColor" stroke-width="1.3"/><path d="M3 10h14" stroke="currentColor" stroke-width="1.3"/></svg>Tiếng Việt</span>
+        </footer>
+    </div>
+</body>
+</html>

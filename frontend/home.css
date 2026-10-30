@@ -1,0 +1,236 @@
+/* 1. Màu sắc, kiểu chữ và biểu tượng dùng chung */
+:root {
+    color-scheme: light;
+    --page: #f5f7f2;
+    --ink: #203c30;
+    --text: #344737;
+    --muted: #7d8875;
+    --green: #367c50;
+    --lime: #d0f36d;
+    --line: #e7ece1;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--text); -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:focus-visible { outline: 3px solid #86a86a; outline-offset: 4px; }
+svg { display: block; }
+.icon { width: 20px; height: 20px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.icon-library { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* 2. Thanh điều hướng */
+.site-header { min-height: 82px; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; gap: 30px; background: #fff; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 9px; color: var(--ink); font-size: 27px; font-weight: 750; letter-spacing: -1.3px; }
+.brand-mark { width: 37px; height: 37px; display: grid; place-items: center; background: var(--lime); border-radius: 12px; }
+.brand-mark svg { width: 30px; height: 30px; }
+.brand-dot { color: var(--green); }
+.primary-nav { display: flex; align-items: stretch; align-self: stretch; gap: 34px; }
+.nav-item { display: flex; align-items: center; justify-content: center; gap: 9px; position: relative; border: 0; padding: 0 4px; background: transparent; color: #87917f; font-size: 13px; font-weight: 550; white-space: nowrap; }
+.nav-item .icon { width: 18px; height: 18px; }
+.nav-item.active { color: #335e3d; font-weight: 650; }
+.nav-item.active::after { content: ""; position: absolute; bottom: -1px; left: 0; right: 0; height: 3px; border-radius: 3px 3px 0 0; background: #87ad55; }
+.nav-item:is(button):hover { color: var(--green); }
+.account-button { display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: transparent; color: var(--text); text-align: left; border-radius: 12px; }
+.avatar { width: 37px; height: 37px; display: grid; place-items: center; background: #f0f4e9; color: #6c8756; border: 1px solid #e8eddf; border-radius: 50%; }
+.avatar .icon { width: 19px; height: 19px; }
+.account-details > span { display: block; margin-bottom: 3px; color: #8b9583; font-size: 10px; }
+.account-details > strong { display: block; font-size: 12px; font-weight: 650; }
+.account-chevron { width: 15px; height: 15px; margin-left: 8px; color: #859179; }
+
+/* 3. Bố cục: bảng đặt xe bên trái, bản đồ bên phải */
+.booking-layout { max-width: 1700px; margin: 0 auto; padding: 26px 32px; display: grid; grid-template-columns: 370px minmax(0, 1fr); gap: 25px; align-items: stretch; }
+.booking-sidebar { min-width: 0; }
+.booking-card { padding: 26px 26px 22px; border: 1px solid #e6ebdf; border-radius: 21px; background: #fff; box-shadow: 0 8px 30px #2e4a3007; }
+.eyebrow { display: flex; align-items: center; gap: 7px; margin: 0 0 13px; color: #80916e; font-size: 8px; font-weight: 700; letter-spacing: 1.45px; }
+.eyebrow > span { width: 14px; height: 2px; background: #8ba56b; }
+h1 { margin: 0; color: var(--ink); font-size: 29px; line-height: 1.25; font-weight: 650; letter-spacing: -1.1px; }
+h1 > span { color: #6b9845; }
+.card-heading > p:last-child { margin: 10px 0 0; color: #859078; font-size: 12px; line-height: 1.75; }
+.booking-steps { margin: 23px 0 24px; padding: 0 0 20px; display: flex; gap: 12px; justify-content: space-between; list-style: none; border-bottom: 1px solid #edf0e7; }
+.booking-steps li { display: flex; align-items: center; gap: 5px; color: #9aa38f; font-size: 9px; white-space: nowrap; }
+.booking-steps li > span { width: 18px; height: 18px; display: grid; place-items: center; background: #f1f4ec; border-radius: 50%; color: #9ba78e; font-size: 9px; }
+.booking-steps .current { color: #4d713f; font-weight: 650; }
+.booking-steps .current > span { background: #eaf4d8; color: #547f3a; }
+
+/* 4. Các ô chọn địa điểm */
+.field-group > label { display: block; margin: 0 0 8px; color: #54634a; font-size: 13px; font-weight: 600; }
+.input-wrapper { display: flex; align-items: center; height: 49px; gap: 11px; padding: 0 13px; background: #fbfcf8; border: 1px solid #e4e9dc; border-radius: 10px; transition: border-color .15s, box-shadow .15s; }
+.input-wrapper:focus-within { border-color: #88a96d; box-shadow: 0 0 0 3px #9ab67d17; background: #fff; }
+.input-wrapper > input { width: 100%; min-width: 0; height: 100%; padding: 0; border: 0; outline: none; background: transparent; color: #3d5335; font-size: 14px; }
+.input-wrapper > input::placeholder { color: #98a18c; opacity: 1; }
+.pickup-symbol { width: 10px; height: 10px; flex: 0 0 10px; border: 3px solid #86a55c; border-radius: 50%; }
+.destination-symbol { width: 9px; height: 9px; flex: 0 0 9px; margin: 0 .5px; background: #3e5e40; border-radius: 2px; }
+.input-icon-button { display: grid; place-items: center; border: 0; background: transparent; padding: 4px; color: #7c9169; border-radius: 4px; }
+.input-icon-button .icon { width: 18px; height: 18px; }
+.input-icon-button:hover { color: #3f6b36; }
+.swap-row { position: relative; height: 15px; }
+.swap-row > span { position: absolute; left: 18px; height: 15px; border-left: 1px dashed #c4d1b5; }
+.swap-button { position: absolute; top: -7px; right: 14px; z-index: 1; width: 29px; height: 29px; display: grid; place-items: center; border: 1px solid #e8eddf; border-radius: 50%; background: #fff; color: #8a9a79; }
+.swap-button .icon { width: 15px; height: 15px; }
+.map-select-button { display: flex; align-items: center; gap: 6px; width: 100%; margin-top: 10px; padding: 3px 0; border: 0; background: transparent; color: #6e895a; font-size: 10px; text-align: left; border-radius: 3px; }
+.map-select-button > .icon { width: 14px; height: 14px; }
+.map-select-button > .small-arrow { width: 12px; height: 12px; margin-left: auto; }
+.map-select-button:hover { color: #355b30; }
+
+/* 5. Gợi ý địa điểm và hành động chính */
+.suggested-places { margin: 23px 0 21px; }
+.section-label { margin: 0 0 9px; color: #98a28c; font-size: 8px; letter-spacing: 1.1px; font-weight: 650; }
+.place-button { width: 100%; display: flex; align-items: center; gap: 9px; padding: 10px 0; border: 0; background: transparent; text-align: left; color: #64725a; border-radius: 4px; }
+.place-button + .place-button { border-top: 1px solid #f0f3ea; }
+.place-icon { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; border-radius: 9px; color: #8b9c79; background: #f5f7f0; }
+.place-icon > .icon { width: 15px; height: 15px; }
+.place-button > span:nth-child(2) { min-width: 0; }
+.place-button strong { display: block; margin-bottom: 4px; color: #627354; font-size: 12px; font-weight: 600; }
+.place-button small { display: block; color: #859376; font-size: 10px; line-height: 1.4; }
+.place-chevron { width: 11px; height: 11px; margin-left: auto; color: #a0ac93; }
+.place-button:hover .place-icon { background: #eaf2dd; color: #628348; }
+.vehicle-card { display: flex; align-items: center; gap: 11px; padding: 12px; border: 1px solid #dfe8d0; border-radius: 11px; background: #fafcf5; }
+.vehicle-icon { display: grid; place-items: center; width: 40px; height: 35px; border-radius: 9px; color: #607d45; background: #edf3e2; }
+.vehicle-icon > .icon { width: 25px; height: 25px; }
+.vehicle-card strong { display: block; color: #4b6340; font-size: 12px; font-weight: 650; }
+.vehicle-card div > span { display: block; margin-top: 4px; font-size: 10px; color: #929e82; }
+.vehicle-check { display: grid; place-items: center; width: 16px; height: 16px; margin-left: auto; background: #83a461; border-radius: 50%; color: #fff; }
+.vehicle-check > .icon { width: 12px; height: 12px; stroke-width: 2; }
+.primary-button { width: 100%; min-height: 50px; display: flex; align-items: center; justify-content: center; gap: 13px; margin-top: 19px; border: 1px solid #c3e35f; border-radius: 10px; background: var(--lime); color: #33552a; font-size: 13px; font-weight: 650; transition: background .15s, transform .15s; }
+.primary-button > .icon { width: 18px; height: 18px; }
+.primary-button:hover { background: #c6ec5c; }
+.primary-button:active { transform: translateY(1px); }
+.booking-note { margin: 11px 0 0; font-size: 10px; color: #839173; text-align: center; line-height: 1.7; }
+.trip-message { margin: 15px 0 0; padding: 11px; border: 1px solid #dfe8d4; border-radius: 8px; background: #f4f8ec; font-size: 12px; color: #4d693e; line-height: 1.6; overflow-wrap: anywhere; }
+.trip-message:empty { display: none; }
+.reassurance { display: flex; align-items: center; gap: 11px; padding: 20px 8px 0; }
+.reassurance > span { width: 33px; height: 33px; display: grid; place-items: center; border: 1px solid #e3ead9; border-radius: 11px; color: #80966c; }
+.reassurance > span > .icon { width: 18px; height: 18px; }
+.reassurance strong { display: block; font-size: 10px; font-weight: 600; color: #7d8a70; }
+.reassurance p { margin: 5px 0 0; font-size: 9px; color: #9aa58d; }
+
+/* 6. Bản đồ minh họa và các nút hiển thị */
+.map-panel { position: relative; min-width: 0; min-height: 715px; height: calc(100svh - 134px); overflow: hidden; border: 1px solid #e2e8dc; border-radius: 22px; background: #eaf0e4; }
+.map-image { width: 100%; height: 100%; position: absolute; inset: 0; object-fit: cover; }
+.map-topbar { position: absolute; z-index: 1; top: 22px; left: 22px; right: 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.city-label { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: #fffffff5; border: 1px solid #fff; border-radius: 10px; box-shadow: 0 3px 14px #2f4a2c08; color: #617057; font-size: 11px; font-weight: 550; }
+.city-label > .icon { width: 15px; height: 15px; color: #829765; }
+.city-dot { width: 5px; height: 5px; margin-left: 5px; border-radius: 50%; background: #93ae73; }
+.map-status { display: flex; align-items: center; gap: 6px; padding: 8px 11px; background: #ffffffe6; border: 1px solid #fff; border-radius: 20px; color: #82916f; font-size: 9px; }
+.map-status > span { width: 5px; height: 5px; border-radius: 50%; background: #93ae73; }
+.map-center-message { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: max-content; max-width: calc(100% - 48px); display: flex; align-items: center; flex-direction: column; text-align: center; }
+.journey-mark { width: 73px; height: 73px; display: grid; place-items: center; margin-bottom: 15px; border: 7px solid #ffffff85; border-radius: 25px; background: #375c40; box-shadow: 0 8px 24px #25472c20; transform: rotate(-8deg); }
+.journey-mark > .icon { width: 28px; height: 28px; color: #dcf5a5; transform: rotate(8deg); }
+.map-center-message > strong { padding: 8px 14px; border: 1px solid #fff; border-radius: 8px; background: #ffffffed; color: #4a6440; font-size: 14px; font-weight: 600; box-shadow: 0 3px 18px #2f4a2c05; }
+.map-center-message > span:last-child { margin-top: 7px; padding: 6px 10px; border-radius: 6px; background: #ffffffe8; color: #869374; font-size: 10px; line-height: 1.6; }
+.map-controls { position: absolute; right: 22px; bottom: 142px; display: flex; align-items: center; flex-direction: column; padding: 3px; background: #fff; border: 1px solid #e8eddf; border-radius: 11px; box-shadow: 0 3px 16px #28452d0a; }
+.map-controls > button { width: 34px; height: 35px; display: grid; place-items: center; border: 0; border-radius: 6px; background: #fff; color: #6c805b; font-size: 22px; font-weight: 400; }
+.map-controls > button:hover { background: #f2f6eb; }
+.map-controls > button + button { border-top: 1px solid #edf1e7; border-radius: 0 0 6px 6px; }
+.map-controls > .center-map-button { margin-top: 2px; padding-top: 3px; }
+.center-map-button > .icon { width: 18px; height: 18px; }
+.map-bottom-card { position: absolute; left: 22px; right: 22px; bottom: 41px; display: flex; align-items: center; gap: 13px; padding: 19px; background: #fffffff0; border: 1px solid #fff; border-radius: 15px; box-shadow: 0 6px 23px #2a482b09; }
+.bottom-card-icon { width: 43px; height: 43px; flex: 0 0 43px; display: grid; place-items: center; border-radius: 12px; background: #f0f5e7; color: #789358; }
+.bottom-card-icon > .icon { width: 23px; height: 23px; }
+.map-bottom-card strong { display: block; color: #5a714b; font-size: 12px; font-weight: 650; }
+.map-bottom-card div > span { display: block; margin-top: 6px; color: #9aa58d; font-size: 10px; line-height: 1.6; }
+.bottom-card-arrow { margin-left: auto; color: #95a17f; font-size: 23px; }
+.map-footer { position: absolute; left: 22px; right: 22px; bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #7f9272; font-size: 8px; }
+
+/* 7. Bố cục trên máy tính bảng và điện thoại */
+@media (min-width: 801px) and (max-height: 850px) {
+    .suggested-places, .reassurance { display: none; }
+    .vehicle-card { margin-top: 23px; }
+    .map-panel { min-height: 620px; }
+}
+@media (min-width: 1600px) {
+    .booking-layout { padding-top: 32px; padding-bottom: 32px; gap: 30px; }
+    .map-panel { height: calc(100svh - 146px); }
+}
+@media (max-width: 1100px) {
+    .site-header { padding: 0 25px; gap: 22px; }
+    .primary-nav { gap: 24px; }
+    .booking-layout { grid-template-columns: 340px minmax(0, 1fr); padding: 22px; gap: 20px; }
+    .booking-card { padding: 24px 21px 21px; }
+    .map-topbar { left: 16px; right: 16px; }
+    .map-status { display: none; }
+    .map-bottom-card { left: 16px; right: 16px; padding: 16px 13px; }
+    .map-bottom-card strong { font-size: 11px; }
+    .map-bottom-card div > span { font-size: 9px; }
+    .map-controls { right: 16px; }
+    .map-center-message > strong { font-size: 12px; }
+    .map-center-message > span:last-child { font-size: 9px; }
+}
+@media (max-width: 800px) {
+    .booking-layout { max-width: 650px; grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+    .booking-sidebar { grid-row: 2; }
+    .map-panel { grid-row: 1; min-height: 320px; height: 38svh; border-radius: 18px; }
+    .map-center-message { top: 53%; }
+    .journey-mark { width: 51px; height: 51px; border-width: 5px; margin-bottom: 10px; border-radius: 18px; }
+    .journey-mark > .icon { width: 23px; height: 23px; }
+    .map-bottom-card { display: none; }
+    .map-controls { bottom: 40px; right: 14px; }
+    .map-controls > button { width: 27px; height: 28px; font-size: 18px; }
+    .map-center-message > span:last-child { max-width: 250px; }
+    .map-footer { left: 15px; right: 15px; font-size: 7px; }
+    .booking-card { padding: 27px; }
+    .booking-steps { justify-content: flex-start; gap: 30px; }
+    .booking-steps li { font-size: 10px; }
+    .field-group > label { font-size: 13px; }
+    .input-wrapper > input { font-size: 16px; }
+    .input-wrapper { height: 53px; }
+    .place-button strong { font-size: 12px; }
+    .place-button small { font-size: 10px; }
+    .primary-button { min-height: 53px; font-size: 14px; }
+    .reassurance { padding-bottom: 8px; }
+}
+@media (max-width: 620px) {
+    .site-header { min-height: 0; flex-wrap: wrap; column-gap: 16px; row-gap: 15px; padding: 17px 20px 0; }
+    .brand { font-size: 25px; }
+    .brand-mark { width: 34px; height: 34px; border-radius: 11px; }
+    .brand-mark svg { width: 28px; height: 28px; }
+    .account-details, .account-chevron { display: none; }
+    .avatar { width: 34px; height: 34px; }
+    .primary-nav { order: 3; width: 100%; min-height: 43px; gap: 27px; }
+    .nav-item { font-size: 12px; }
+    .nav-item > .icon { width: 16px; height: 16px; }
+    .booking-layout { padding: 16px; gap: 17px; }
+    .booking-card { border-radius: 18px; padding: 24px 22px 21px; }
+    .booking-steps { gap: 16px; justify-content: space-between; }
+    .booking-steps li { font-size: 9px; }
+    .city-label { padding: 9px 11px; font-size: 10px; }
+    .map-topbar { top: 15px; }
+    .map-panel { min-height: 300px; }
+    .map-center-message { max-width: calc(100% - 76px); left: 45%; }
+    .map-center-message > strong { padding: 7px 8px; font-size: 11px; line-height: 1.6; }
+    .map-center-message > span:last-child { font-size: 8px; }
+    .card-heading > p:last-child { font-size: 13px; }
+    .eyebrow { font-size: 7px; }
+    h1 { font-size: 28px; }
+    .booking-note { font-size: 9px; }
+    .reassurance strong { font-size: 11px; }
+    .reassurance p { font-size: 10px; }
+}
+@media (max-width: 360px) {
+    .booking-layout { padding: 12px; }
+    .booking-card { padding: 22px 17px; }
+    h1 { font-size: 25px; }
+    .booking-steps { gap: 8px; }
+    .booking-steps li { font-size: 8px; }
+    .map-footer > span:last-child { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; }
+}
+.live-map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.map-topbar,
+.map-center-message,
+.map-controls,
+.map-bottom-card,
+.map-footer {
+    display: none;
+}
