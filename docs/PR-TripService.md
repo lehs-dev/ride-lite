@@ -1,24 +1,25 @@
-# feat: add TripService create/read APIs and initial trip state handling
+# Bổ sung API tạo, xem chuyến đi và khung State pattern cho TripService
 
-TripService now persists new Requested trips and lets authenticated riders read their own trips. POST /trips replaces the previous 501 response; GET /trips/{id} returns 404 for missing trips and trips owned by another rider.
+TripService đã lưu được chuyến mới ở trạng thái Requested và cho phép hành khách xem chuyến của mình. POST /trips thay thế phản hồi 501 trước đây; GET /trips/{id} trả 404 khi chuyến không tồn tại hoặc thuộc hành khách khác.
 
-## Changes
-- Add Trip schema and initial EF Core migration, nullable quote fields, payment status, and user foreign keys. Schema updates use migrations rather than EnsureCreated.
-- Add request validation, response DTO, application service, and repository with separate read-only and tracked queries.
-- Read rider identity from authenticated claims and require trips.create / trips.read permissions.
-- Add Swagger UI with Bearer authentication configuration.
-- Add initial Requested and DriverAccepted State classes and entity acceptance behavior. Driver acceptance endpoint remains 501.
-- Update System.Security.Cryptography.Pkcs to 9.0.21.
-- This branch also includes the earlier rider login/map UI and local Gateway configuration.
+## Nội dung thay đổi
+- Bổ sung entity Trip, trạng thái chuyến, trạng thái thanh toán và migration khởi tạo; các trường báo giá được phép chưa có giá trị, RiderId và DriverId liên kết tới Users.
+- Chuyển quản lý cấu trúc database sang migrations; vô hiệu hóa EnsureCreated, giữ phần nạp dữ liệu mẫu.
+- Bổ sung DTO, validation, application service và Repository với truy vấn chỉ đọc / truy vấn theo dõi thay đổi.
+- Lấy mã hành khách từ token, kiểm tra quyền trips.create / trips.read và quyền sở hữu khi xem chuyến.
+- Cấu hình Swagger với Bearer token.
+- Bổ sung State pattern cho Requested và DriverAccepted cùng hành vi nhận chuyến trong entity. API nhận chuyến vẫn trả 501.
+- Nâng System.Security.Cryptography.Pkcs lên 9.0.21 để xử lý cảnh báo bảo mật.
+- Nhánh này cũng gồm giao diện đăng nhập/bản đồ hành khách và cấu hình Gateway local từ phần việc trước.
 
-## Validation
-- Full solution Release build: 0 warnings, 0 errors.
-- Existing automated tests run separately; no new Trip business tests added yet.
-- Manual Postman checks performed by the author: create returns 201 and persists a trip; invalid/missing coordinates return 400 without inserts; missing authentication returns 401; owner reads return 200; another rider and missing IDs return 404.
-- Initial migration applied to a recreated local TripDB. Existing databases created with EnsureCreated require an explicit migration transition; do not apply this initial migration blindly over existing tables.
+## Kiểm tra
+- Build toàn solution ở Release: 0 lỗi, 0 cảnh báo.
+- Các test hiện có đều pass: 8 test Security và 1 test mẫu TripService. Chưa có test tự động nghiệp vụ Trip mới; test mẫu không chứng minh độ bao phủ nghiệp vụ.
+- Kiểm tra thủ công bằng Postman và SSMS: tạo chuyến trả 201 và lưu bản ghi; tọa độ sai hoặc thiếu trả 400, không thêm bản ghi; thiếu token trả 401; xem chuyến của mình trả 200; chuyến người khác hoặc mã không tồn tại trả 404.
+- Migration đã áp dụng sau khi tạo lại TripDB local. Database cũ dùng EnsureCreated cần xử lý chuyển đổi riêng vì migration đầu tiên tạo cả các bảng phân quyền.
 
-## Remaining work
-- Quote confirmation and driver offers, acceptance authorization, concurrency protection, and complete trip lifecycle.
-- Matching/Payment integration, event publishing/consuming, and business/integration tests.
-- Payment method currently receives only required/length validation; Demo was used for manual testing and is not an agreed payment contract.
-- GET currently supports rider ownership only; driver/admin visibility is not implemented.
+## Công việc còn lại
+- Xác nhận báo giá, đề nghị tài xế, quyền nhận chuyến, chống nhận đồng thời và hoàn thiện vòng đời chuyến.
+- Tích hợp Matching/Payment, phát và nhận event, test nghiệp vụ và test tích hợp.
+- PaymentMethod hiện chỉ kiểm tra bắt buộc và độ dài. Demo là giá trị kiểm tra, chưa phải phương thức thanh toán được nhóm chốt.
+- GET hiện chỉ phục vụ hành khách xem chuyến của mình; chưa có quyền xem của tài xế và quản trị viên.
