@@ -14,10 +14,87 @@ public class TripDbContext : DbContext
     public DbSet<Permission> Permissions => Set<Permission>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+    public DbSet<Trip> Trips => Set<Trip>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        // Trip
+        modelBuilder.Entity<Trip>(builder =>
+        {
+            builder.ToTable("Trips");
+
+            builder.HasKey(t => t.Id);
+            builder.Property(t => t.Id).HasColumnName("id");
+            builder.Property(t => t.RiderId).HasColumnName("riderId");
+            builder.Property(t => t.DriverId).HasColumnName("driverId");
+
+            builder.Property(t => t.FromLat).HasColumnName("fromLat");
+            builder.Property(t => t.FromLon).HasColumnName("fromLon");
+            builder.Property(t => t.FromAddress).HasColumnName("fromAddress");
+
+            builder.Property(t => t.ToLat).HasColumnName("toLat");
+            builder.Property(t => t.ToLon).HasColumnName("toLon");
+            builder.Property(t => t.ToAddress).HasColumnName("toAddress");
+
+            builder.Property(t => t.Status).HasColumnName("status");
+            builder.Property(t => t.Distance).HasColumnName("distance");
+            builder.Property(t => t.EstimatedTime).HasColumnName("estimatedTime");
+            builder.Property(t => t.Price).HasColumnName("price");
+
+            builder.Property(t => t.PaymentMethod).HasColumnName("paymentMethod");
+            builder.Property(t => t.PaymentStatus).HasColumnName("paymentStatus");
+
+            builder.Property(t => t.CreatedAtUtc)
+                .HasColumnName("createdAt")
+                .HasColumnType("datetime2");
+
+            builder.Property(t => t.UpdatedAtUtc)
+                .HasColumnName("updatedAt")
+                .HasColumnType("datetime2");
+
+            builder.Property(t => t.PickUpTimeUtc)
+                .HasColumnName("pickUpTime")
+                .HasColumnType("datetime2");
+
+            builder.Property(t => t.DropOffTimeUtc)
+                .HasColumnName("dropOffTime")
+                .HasColumnType("datetime2");
+
+            builder.Property(t => t.FromAddress)
+                .IsRequired()
+                .HasMaxLength(255);
+
+            builder.Property(t => t.ToAddress)
+                .IsRequired()
+                .HasMaxLength(255);
+
+            builder.Property(t => t.Price)
+                .HasPrecision(10, 2);
+
+            builder.Property(t => t.Status)
+            .HasConversion<string>()
+            .HasMaxLength(255)
+            .IsRequired();
+
+            builder.Property(t => t.PaymentStatus)
+                .HasConversion<string>()
+                .HasMaxLength(255)
+                .IsRequired();
+
+            builder.Property(t => t.PaymentMethod)
+                .HasMaxLength(255)
+                .IsRequired();
+            builder.HasOne<User>()
+                .WithMany()
+                .HasForeignKey(t => t.RiderId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne<User>()
+                .WithMany()
+                .HasForeignKey(t => t.DriverId)
+                .OnDelete(DeleteBehavior.NoAction);
+                });
 
         // User
         modelBuilder.Entity<User>(builder =>
