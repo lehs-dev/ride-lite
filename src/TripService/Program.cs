@@ -1,6 +1,9 @@
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SwiftRide.Security;
 using TripService.Api;
+using TripService.Application.Abstractions;
 using TripService.Application.Services;
 using TripService.Domain.Repositories;
 using TripService.Infrastructure.Persistence;
@@ -9,6 +12,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using TripService.Application.DTOs;
 using Microsoft.OpenApi;
+using TripService.Domain.Services;
+using TripService.Infrastructure.Messaging;
+using TripService.Infrastructure.Payment;
+using TripService.Infrastructure.Persistence;
+using TripService.Infrastructure.Pricing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,12 +50,54 @@ builder.Services.AddSwaggerGen(options =>
             [new OpenApiSecuritySchemeReference("bearer", document)] = []
         });
 });
+// Read model thanh toán (P1-4): BaseUrl trống = client trả null, trip API vẫn chạy bình thường.
+builder.Services.AddOptions<PaymentReadModelOptions>()
+    .BindConfiguration(PaymentReadModelOptions.SectionName);
+builder.Services.AddHttpClient<IPaymentReadModelClient, PaymentReadModelClient>();
+
+builder.Services.AddScoped<ITripAppService, TripAppService>();
+
+builder.Services.AddOptions<TripPricingOptions>()
+    .BindConfiguration(TripPricingOptions.SectionName);
+builder.Services.AddSingleton<IFareCalculator, HaversineFareCalculator>();
+
+builder.Services.AddOptions<RabbitMqOptions>()
+    .BindConfiguration(RabbitMqOptions.SectionName)
+    .Validate(options => !string.IsNullOrWhiteSpace(options.Host), "RabbitMq:Host là bắt buộc.");
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<PaymentSettledConsumer, PaymentSettledConsumerDefinition>();
+    x.AddConsumer<PaymentFailedConsumer, PaymentFailedConsumerDefinition>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        var rabbit = context.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
+        cfg.Host(rabbit.Host, (ushort)rabbit.Port, rabbit.VirtualHost, h =>
+        {
+            h.Username(rabbit.UserName);
+            h.Password(rabbit.Password);
+        });
+        cfg.ConfigureEndpoints(context);
+    });
+});
+
+builder.Services.AddScoped<ITripEventPublisher, TripEventPublisher>();
+builder.Services.AddHostedService<OutboxDispatcherWorker>();
+
+// Readiness (P1-3): SQL Server phải kết nối được; broker check qua IBusControl đã start.
+builder.Services.AddHealthChecks()
+    .AddCheck<TripDbHealthCheck>("tripdb")
+    .AddCheck<SwiftRide.Security.RabbitMqHealthCheck>("rabbitmq");
+
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseSwiftRideProblemDetails();
 
 // Khởi tạo schema và nạp dữ liệu phân quyền mẫu khi DB sẵn sàng
 using (var scope = app.Services.CreateScope())
@@ -70,6 +120,7 @@ app.UseAuthorization();
 
 app.MapGet("/health/live", () => Results.Ok(new { service = "TripService", status = "Healthy" }))
     .AllowAnonymous();
+app.MapHealthChecks("/health/ready").AllowAnonymous();
 
 // Ánh xạ bộ API Xác thực & Phân quyền động (RBAC)
 app.MapAuthEndpoints();
@@ -151,5 +202,6 @@ app.MapPost("/trips/{id:guid}/driver-accept", (Guid id) => Results.Problem(
     detail: "Trip application handler has not been implemented.",
     statusCode: StatusCodes.Status501NotImplemented))
     .RequirePermission(PermissionsCatalog.TripsAccept);
+app.MapTripEndpoints();
 
 app.Run();

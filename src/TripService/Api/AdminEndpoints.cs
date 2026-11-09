@@ -74,27 +74,29 @@ public static class AdminEndpoints
             }
         }).RequirePermission(PermissionsCatalog.UsersManage);
 
-        // 4. Giám sát toàn bộ chuyến đi cho Admin
-        group.MapGet("/trips", () =>
+        // 4. Giám sát toàn bộ chuyến đi cho Admin — query thật từ TripDB
+        group.MapGet("/trips", async (
+            string? status,
+            DateTime? from,
+            DateTime? to,
+            int? page,
+            int? pageSize,
+            ITripAppService service,
+            CancellationToken cancellationToken) =>
         {
-            // Trả về danh sách chuyến đi mẫu cho Dashboard quản trị
-            var mockTrips = new List<AdminTripDto>
-            {
-                new(Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                    Guid.NewGuid(),
-                    Guid.NewGuid(),
-                    "Completed",
-                    120000m,
-                    DateTime.UtcNow.AddHours(-2)),
-                new(Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                    Guid.NewGuid(),
-                    null,
-                    "Requested",
-                    85000m,
-                    DateTime.UtcNow.AddMinutes(-10))
-            };
+            var size = Math.Clamp(pageSize ?? 20, 1, 100);
+            var current = Math.Max(page ?? 1, 1);
 
-            return Results.Ok(mockTrips);
+            try
+            {
+                var trips = await service.ListTripsForAdminAsync(status, from, to, current, size, cancellationToken);
+                return Results.Ok(trips);
+            }
+            catch (ArgumentException ex)
+            {
+                return Results.Problem(title: "Dữ liệu không hợp lệ", detail: ex.Message,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
         }).RequirePermission(PermissionsCatalog.TripsRead);
 
         return app;

@@ -55,7 +55,7 @@ Các service giao tiếp đồng bộ qua REST (thông qua Gateway) và bất đ
 | **API Gateway** | `gateway:5000` | `127.0.0.1:5000` | Điểm vào duy nhất cho client |
 | **Trip Service & Auth** | `trip-service:8080` | `127.0.0.1:5001` | Quản lý vòng đời chuyến đi, User và Dynamic RBAC |
 | **Matching Service** | `matching-service:8080` | `127.0.0.1:5002` | Báo giá và tìm tài xế |
-| **Payment Service** | `payment-service:8080` | `127.0.0.1:5003` | Thanh toán và sổ cái |
+| **Payment Service** | `payment-service:8080` | `127.0.0.1:5003` | Thanh toán, hoàn tiền và audit (outbox/inbox) |
 | **SQL Server (TripDB)** | `sqlserver:1433` | `127.0.0.1:1433` | User: `sa` |
 | **MongoDB (MatchDB)** | `mongodb:27017` | `127.0.0.1:27017` | User: `swiftdev` |
 | **PostgreSQL (PayDB)** | `postgres:5432` | `127.0.0.1:${POSTGRES_HOST_PORT:-5432}` | User: `swiftdev`, DB: `PayDB` |

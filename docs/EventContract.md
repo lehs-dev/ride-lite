@@ -10,20 +10,23 @@ Event Contract là quy định chung về cấu trúc và ý nghĩa của các t
 
 Ví dụ, khi tài xế trả khách xong, Trip Service phát event `RideCompleted` để Payment Service biết chuyến nào đã hoàn thành và cần được thanh toán.
 
-**Ví dụ dữ liệu của RideCompleted (đề xuất, chưa chốt):**
+**Ví dụ dữ liệu của RideCompleted (đã triển khai — xem §2.1 để đủ tập trường):**
 
 ```json
 {
   "eventId": "6e19426e-04f5-4903-868e-f03f3d58bf12",
   "tripId": "ca486d82-4883-4382-9ab7-aee8c75a1653",
+  "riderId": "9c0d5f2e-2b1f-4c3a-8a3f-2b6f0d9c1e44",
   "amount": 95000,
   "currency": "VND",
-  "occurredAt": "2026-10-12T06:00:00Z",
-  "correlationId": "095eb521-ebec-4219-8c41-21417216497c"
+  "paymentRequestKey": "trip:ca486d82488343829ab7aee8c75a1653",
+  "occurredAtUtc": "2026-10-12T06:00:00Z",
+  "correlationId": "095eb521-ebec-4219-8c41-21417216497c",
+  "schemaVersion": 1
 }
 ```
 
-Trong tài liệu kiến trúc có đề cập đến `RideCompleted` và `PaymentSettled`, nhưng chưa quy định chi tiết các trường dữ liệu trong DTO. Vì vậy, phần này cần được thống nhất trước khi triển khai.
+Tập trường chính thức của cả ba event đã được chốt và triển khai — xem **§2.1**.
 
 ## 2. Các event cần thống nhất
 
@@ -33,7 +36,36 @@ Trong tài liệu kiến trúc có đề cập đến `RideCompleted` và `Payme
 | `PaymentSettled` | Payment | Trip | Thanh toán và ghi nhận giao dịch thành công |
 | `PaymentFailed` | Payment | Trip | Thanh toán thất bại sau khi hết cơ chế retry theo thỏa thuận |
 
-**Đề xuất:** Triển khai `RideCompleted` và `PaymentSettled` trước. `PaymentFailed` sẽ bổ sung sau khi nhóm thống nhất cách xử lý thanh toán lỗi.
+**Đã chốt (2026-11-04):** cả ba event đều triển khai. `PaymentFailed` không còn "deferred" — xem §2.1 để biết ngữ nghĩa và tập trường.
+
+### 2.1 Hợp đồng đã chốt
+
+Cả ba DTO sống trong `src/Contracts/Events/`, dùng chung qua project reference. Idempotency key
+là `(TripId, PaymentRequestKey)` chứ không phải `EventId` (§3.4). `PaymentRequestKey` do
+`EventContracts.BuildPaymentRequestKey(tripId)` sinh ra, giá trị `trip:{tripId:N}` — hai bên đều
+phải dùng đúng hàm này, vì TripService từ chối `PaymentSettled` mang key khác key đã lưu lúc dropoff.
+
+| Event | Trường | Ngữ nghĩa |
+|---|---|---|
+| `RideCompleted` | EventId, TripId, RiderId, DriverId?, Amount, Currency, OccurredAtUtc, CorrelationId?, PaymentRequestKey, SchemaVersion | Trip đã trả khách, số tiền do server chốt. PaymentService thu tiền. |
+| `PaymentSettled` | EventId, TripId, PaymentId, TransactionId?, PaymentRequestKey, Amount, Currency, OccurredAtUtc, CorrelationId?, SchemaVersion | Đã thu tiền thành công. TripService chuyển `PaymentPending → Paid`. |
+| `PaymentFailed` | EventId, TripId, PaymentId, PaymentRequestKey, ReasonCode, RetryExhausted, OccurredAtUtc, CorrelationId?, AttemptCount, SchemaVersion | Payment đạt trạng thái `Failed` vĩnh viễn: gateway từ chối không retryable, hoặc đã đụng trần retry. `AttemptCount` = số lần retry đã dùng (mặc định 0 với lỗi từ chối ngay lần đầu; payload schema 1 thiếu field vẫn đọc được). |
+
+Quy tắc xử lý `PaymentFailed` phía Trip (M5-08):
+
+- Trip **giữ nguyên `PaymentPending`**; không đánh dấu `Paid`, không hoàn tác việc đã chở khách.
+- Ghi một `TripStatusHistory` (`ActorType=Consumer`, `FromStatus=ToStatus=PaymentPending`,
+  `Reason` chứa `ReasonCode`) — mã lỗi đầy đủ nằm ở `Payment.FailureCode` trong PayDB.
+- Nếu trip đã `Paid` thì event đến muộn là no-op có chủ đích: **không bao giờ hạ cấp** `Paid`.
+- Không có API public để client tự đánh dấu Paid/Failed. Rider/admin phục hồi bằng
+  `POST /payments/{id}/retry` hoặc `POST /payments/trip/{tripId}/retry` (retry theo trip khi
+  chưa biết payment id; chỉ owner hoặc Admin), payment được mở lại với hạn mức retry mới.
+  Admin có thêm `POST /admin/payments/{id}/retry`.
+- Event chỉ được phát khi payment thật sự chốt `Failed`. Kết quả trung gian
+  (`Created`/`Charging`/`PendingRetry`) **không** được claim inbox, để redelivery tiếp tục được việc.
+
+Hàng đợi tiêu thụ: `payment-service.ride-completed`, `trip-service.payment-settled`,
+`trip-service.payment-failed`. Event thất bại rơi vào `_error` thay vì bị ACK im lặng.
 
 ## 3. Những vấn đề cần B và E xác nhận
 

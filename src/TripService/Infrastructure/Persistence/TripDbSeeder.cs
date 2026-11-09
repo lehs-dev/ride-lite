@@ -12,8 +12,10 @@ public static class TripDbSeeder
         // Tự động tạo schema bảng nếu chưa tồn tại
         // await db.Database.EnsureCreatedAsync();
 
-        // 1. Seed Permissions
-        var existingPermCodes = await db.Permissions.Select(p => p.Code).ToListAsync();
+        // 1. Seed Permissions. Danh sách này PHẢI phủ toàn bộ PermissionsCatalog.All —
+        //    TripDbSeederTests kiểm chứng, nên thêm permission mà quên seed là đỏ test ngay.
+        //    Trước đây list thiếu trips.admin/payments.admin/users.read: endpoint đòi quyền là
+        //    404 với role thường và chỉ "tình cờ" chạy được cho Admin nhờ role bypass.
         var permissionsToSeed = new List<(string Code, string Description, string Module)>
         {
             (PermissionsCatalog.TripsCreate, "Tạo yêu cầu chuyến đi mới", "Trips"),
@@ -21,14 +23,18 @@ public static class TripDbSeeder
             (PermissionsCatalog.TripsAccept, "Tài xế nhận chuyến đi", "Trips"),
             (PermissionsCatalog.TripsUpdateStatus, "Cập nhật trạng thái chuyến đi", "Trips"),
             (PermissionsCatalog.TripsCancel, "Hủy chuyến đi", "Trips"),
+            (PermissionsCatalog.TripsAdmin, "Quản trị toàn bộ chuyến đi", "Trips"),
             (PermissionsCatalog.MatchingQuote, "Yêu cầu báo giá ước tính", "Matching"),
             (PermissionsCatalog.MatchingMatch, "Tìm kiếm và ghép nối tài xế", "Matching"),
             (PermissionsCatalog.PaymentsCreate, "Thực hiện thanh toán chuyến đi", "Payments"),
             (PermissionsCatalog.PaymentsRead, "Xem thông tin giao dịch thanh toán", "Payments"),
-            (PermissionsCatalog.PaymentsRefund, "Xử lý hoàn tiền giao dịch", "Payments"),
+            (PermissionsCatalog.PaymentsAdmin, "Tra soát toàn bộ giao dịch thanh toán", "Payments"),
             (PermissionsCatalog.RolesManage, "Quản lý vai trò và phân quyền", "Identity"),
             (PermissionsCatalog.UsersManage, "Quản lý người dùng và phân vai trò", "Identity"),
+            (PermissionsCatalog.UsersRead, "Xem danh sách người dùng", "Identity"),
         };
+
+        var existingPermCodes = await db.Permissions.Select(p => p.Code).ToListAsync();
 
         foreach (var (code, desc, module) in permissionsToSeed)
         {
@@ -97,14 +103,16 @@ public static class TripDbSeeder
             }
         }
 
-        // Rider: trips.create, trips.read, trips.cancel, matching.quote, payments.create
+        // Rider: trips.create, trips.read, trips.cancel, matching.quote, payments.create, payments.read.
+        // Thiếu payments.read thì mọi GET /payments của rider trả 404/403 dù chính họ vừa trả tiền.
         var riderPermCodes = new[]
         {
             PermissionsCatalog.TripsCreate,
             PermissionsCatalog.TripsRead,
             PermissionsCatalog.TripsCancel,
             PermissionsCatalog.MatchingQuote,
-            PermissionsCatalog.PaymentsCreate
+            PermissionsCatalog.PaymentsCreate,
+            PermissionsCatalog.PaymentsRead
         };
         var currentRiderPermIds = riderRole.RolePermissions.Select(rp => rp.PermissionId).ToHashSet();
         foreach (var code in riderPermCodes)

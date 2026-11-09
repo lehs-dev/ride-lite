@@ -17,7 +17,6 @@ public static class PermissionsCatalog
     // Payments
     public const string PaymentsCreate = "payments.create";
     public const string PaymentsRead = "payments.read";
-    public const string PaymentsRefund = "payments.refund";
     public const string PaymentsAdmin = "payments.admin";
 
     // Identity & RBAC
@@ -37,7 +36,6 @@ public static class PermissionsCatalog
         MatchingMatch,
         PaymentsCreate,
         PaymentsRead,
-        PaymentsRefund,
         PaymentsAdmin,
         RolesManage,
         UsersManage,

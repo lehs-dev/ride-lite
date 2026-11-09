@@ -112,7 +112,7 @@ Tiến độ có trọng số = tổng trọng số các mốc đã nghiệm thu
 | D05 | Trước khi driver nhận | Giữ Requested, dùng BookingPhase và offer để phân biệt chờ quote/rider/driver | Trip, frontend, Matching | Chưa chốt |
 | D06 | Hủy chuyến | Bản cơ bản cho rider hủy trước PickedUp; chưa có phí hủy | Trip, frontend | Chưa chốt |
 | D07 | Event payload và namespace | Dùng chung DTO trong Contracts; bổ sung trường theo mục 9 | Trip (B), Payment (E), Messaging (F) | Chưa chốt |
-| D08 | PaymentFailed/recovery | Giữ PaymentPending + trạng thái phụ cần xử lý; retry/reconcile dùng cùng payment key | Trip, Payment, F | Chưa chốt |
+| D08 | PaymentFailed/recovery | Giữ PaymentPending + trạng thái phụ cần xử lý; retry/reconcile dùng cùng payment key | Trip, Payment, F | **Đã chốt 2026-11-04**: `PaymentFailedConsumer` ghi `TripStatusHistory` (mã lỗi từ `Payment.FailureCode`), trip giữ `PaymentPending`; recovery phía Payment là worker lease-sweep + `POST /payments/{id}/retry` (owner/Admin) |
 | D09 | Outbox/Inbox | Chọn một cơ chế dùng chung với F, ưu tiên tận dụng khả năng phù hợp của MassTransit/EF | Trip, F | Chưa chốt |
 | D10 | Tài khoản bị khóa/quyền bị thu hồi | Chốt mức hiệu lực tức thì hay sau token expiry; thực thi và test đúng chính sách | Trip, Security | Chưa chốt |
 | D11 | Auth theo đề | Đối chiếu JWT hiện tại với OAuth2/OIDC nêu trong PDF; ghi rõ nếu nhóm dùng JWT local cho phạm vi demo | Nhóm, giảng viên nếu cần | Chưa chốt |
@@ -196,7 +196,7 @@ Theo EventContract hiện có, B/E/F là ký hiệu vai trò phối hợp; khôn
 - [ ] **M5-05** Chọn và triển khai một Outbox bền vững; dispatcher publish lại sau lỗi/restart, giữ nguyên EventId/payment key. Không chỉ dùng in-memory outbox để tuyên bố chống mất event khi process chết.
 - [ ] **M5-06** Consumer PaymentSettled kiểm tra TripId, payment identity, amount/currency theo contract; chỉ chuyển PaymentPending sang Paid, lưu transaction/payment reference và history.
 - [ ] **M5-07** Consumer có Inbox/dedup bền vững; ghi dấu đã xử lý cùng transaction cập nhật Trip. Hai consumer xử lý cùng event đồng thời vẫn chỉ tạo một hiệu ứng nghiệp vụ.
-- [ ] **M5-08** Xử lý PaymentFailed theo contract: giữ chuyến cần xử lý, không đánh dấu Paid hoặc tự động hoàn tác việc đã chở khách; sự kiện failure đến sau success không hạ trạng thái Paid.
+- [x] **M5-08** Xử lý PaymentFailed theo contract: giữ chuyến cần xử lý, không đánh dấu Paid hoặc tự động hoàn tác việc đã chở khách; sự kiện failure đến sau success không hạ trạng thái Paid. — `PaymentFailedConsumer` + `trip-service.payment-failed` queue; test `PaymentFailedConsumerTests`.
 - [ ] **M5-09** Thống nhất retry/redelivery/error queue với F; lỗi dữ liệu vĩnh viễn không retry vô hạn; phân biệt retry kỹ thuật với phát sinh yêu cầu thanh toán nghiệp vụ mới.
 - [ ] **M5-10** Truyền correlation/causation/trace context; log định danh Trip/Event vừa đủ, không log token hoặc payload nhạy cảm.
 - [ ] **M5-11** Test bằng messaging harness cho publish/consume, sau đó RabbitMQ thật cho routing/serialization/retry; test SQL Server thật cho transaction Outbox/Inbox.
@@ -290,7 +290,7 @@ Các route bổ sung dưới đây là thiết kế đề xuất để hiện th
 | POST /trips/{id}/cancel | Rider sở hữu; trips.cancel | 200 | Theo D06; không hủy chuyến đã chở xong để né thanh toán |
 | GET /admin/trips | Admin theo Gateway và quyền Trip phù hợp | 200 + page | Query DB thật, thay mock; không cấp API admin cho Rider chỉ vì có trips.read |
 
-PaymentSettled/PaymentFailed đi qua consumer, **không tạo API public cho client tự đánh dấu Paid**. Nếu cần thao tác đối soát/admin retry thì phải có policy, audit và contract riêng; chưa nằm trong API cơ bản.
+PaymentSettled/PaymentFailed đi qua consumer, **không tạo API public cho client tự đánh dấu Paid**. Đường phục hồi duy nhất là `POST /payments/{id}/retry` thuộc PaymentService (chỉ owner hoặc Admin, reset hạn mức retry) — Trip không có API nào viết trạng thái Paid/Failed.
 
 Quy ước lỗi: 400 cho validation, 401 cho thiếu/sai token, 403 cho thiếu quyền/ownership, 404 cho tài nguyên không tồn tại, 409 cho xung đột trạng thái/concurrency/idempotency. Chốt cách che tài nguyên trái quyền nếu nhóm chọn trả 404. Lỗi upstream trả mã/ProblemDetails đã thống nhất và trạng thái recoverable; không biến mọi lỗi thành 500 hoặc Failed vĩnh viễn. Lệnh lặp cùng actor và cùng tác động đã hoàn tất có thể trả kết quả cũ theo quy tắc idempotency, nhưng không phát sinh event/history lần hai.
 
@@ -334,14 +334,14 @@ Mức độ dưới đây là ưu tiên trong đồ án, không phải điểm �
 
 | ID | Ưu tiên/tình trạng | Vị trí và vấn đề | Hướng xử lý, test đóng lỗi |
 |---|---|---|---|
-| BUG-01 | P0; đã xác minh code | AuthService.RegisterAsync nhận Role bất kỳ đang tồn tại, gồm Admin | Allowlist role đăng ký hoặc bắt buộc Rider; role cao chỉ qua API quản trị. Test đăng ký Role=Admin không nhận quyền Admin |
+| BUG-01 | P0; **đã sửa 2026-11-04** | AuthService.RegisterAsync nhận Role bất kỳ đang tồn tại, gồm Admin | `SelfRegistrableRoles = [Rider, Driver]`; role khác (kể cả Admin/blank) rơi về Rider, Admin chỉ gán qua API quản trị. Test đóng lỗi: `RbacRegressionTests.PublicRegistration_NeverGrantsPrivilegedRole` (Admin/admin/role lạ/blank) và `PublicRegistration_AllowsSelfRegistrableRoles` |
 | BUG-02 | P0; đã tái hiện Gateway | Fallback policy yêu cầu authenticated, route auth/admin-login không được đánh dấu anonymous tại Gateway; 3 smoke request trả 401 | Cấu hình anonymous đúng cho YARP route public, giữ auth cục bộ ở Trip; test credentials hợp lệ/sai và /auth/me vẫn cần token |
 | BUG-03 | P0 cho local E2E; đã xác minh config | Gateway trỏ trip-service:8080, matching-service:8080, payment-service:8080 nhưng Compose chưa có các service container này | Chọn chạy host thì override localhost/port; chạy cùng workspace thì dùng địa chỉ/port thực; hoặc F thêm app container. Xác nhận launch profile không đẩy Trip sang port 5175 ngoài dự kiến |
 | BUG-04 | P1; đã xác minh code | EnsureCreated không cung cấp đường nâng cấp schema khi thêm Trips; chưa có migrations | Kế hoạch M1, test DB trắng và DB RBAC cũ; không reset DB cần giữ dữ liệu |
 | BUG-05 | P1; đã xác minh code/config | JWT key và connection password dev được đặt trực tiếp trong config/fallback source | Externalize và fail rõ khi thiếu config; không dùng fallback secret. Nếu key thật từng được dùng/chia sẻ thì thay key và đánh giá token cũ |
 | BUG-06 | P1; đã xác minh code, cần chốt D10 | IsActive chỉ chặn login, quyền nằm trong token đã phát vẫn dùng tới expiry | Chốt cơ chế kiểm tra/thu hồi hoặc ghi rõ hiệu lực trì hoãn; regression khóa user/thu hồi quyền với token đã cấp |
 | BUG-07 | P1; đã xác minh code | DTO Auth thiếu validation; đăng ký lưu user và role bằng hai SaveChanges không có transaction bao trùm | Validate/null/độ dài/email/password; transaction; test lỗi bước sau không để user dở dang, concurrent đăng ký trùng không thành 500 |
-| BUG-08 | P1; đã xác minh code | Catalog có trips.admin, payments.admin, users.read nhưng seeder chưa nạp; seeder thêm lại permission mặc định mỗi startup | Đồng bộ catalog/seed và chính sách seed-upgrade; restart không hoàn tác thay đổi RBAC ngoài ý muốn; test role được ủy quyền dùng quyền đã cấu hình |
+| BUG-08 | P1; **đã sửa 2026-11-04** | Catalog có trips.admin, payments.admin, users.read nhưng seeder chưa nạp; seeder thêm lại permission mặc định mỗi startup | Seeder nạp đủ `PermissionsCatalog.All` và thêm `payments.read` cho Rider (endpoint GET /payments trước đây 403 với rider). Danh sách seed được kiểm bằng test thay vì tự phát mỗi startup. Test đóng lỗi: `RbacRegressionTests.Seed_CoversEveryPermissionInCatalog`, `Rider_CanReadAndCreatePayments`, `Admin_HoldsAdminScopedPermissions`, `Seed_RunTwice_DoesNotDuplicatePermissionsOrGrants` |
 | BUG-09 | P1; đã xác minh code | Startup catch lỗi seed rồi log sẽ nạp khi DB sẵn sàng nhưng không có cơ chế retry; health/live vẫn 200 | Liveness riêng, readiness kiểm tra phụ thuộc cần thiết; lỗi config/schema phải hiện rõ; transient retry có giới hạn nếu chọn |
 | BUG-10 | P2; đã xác minh code | Gán role/permission bỏ qua mã không tồn tại; expiresIn login/register cố định 3600 dù lifetime có config | Reject input không hợp lệ, thống nhất expiry response với token; test role/code sai và lifetime khác 60 phút |
 | BUG-11 | P1; đã xác minh build audit | NU1902/NU1903 cho System.Security.Cryptography.Pkcs 9.0.11, build hiện có 8 warning lặp theo project | Xác định dependency trực tiếp/bắc cầu, chọn bản sửa tương thích, restore/build/test lại; ghi rõ nếu chưa xử lý |

@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -65,6 +67,43 @@ public static class TelemetryExtensions
             });
 
             await next();
+        });
+    }
+
+    /// <summary>
+    /// Global exception handler thống nhất (P1-3): mọi exception chưa được endpoint tự map
+    /// sẽ trả ProblemDetails (RFC 9457) kèm TraceId để đối chiếu log/OTel, thay vì HTML trắng
+    /// hoặc thông báo chung của Kestrel. Đặt TRƯỚC UseSwiftRideCorrelationId để OnStarting
+    /// của correlation header đăng ký sau cùng và vẫn gắn được lên response lỗi.
+    /// </summary>
+    public static IApplicationBuilder UseSwiftRideProblemDetails(this IApplicationBuilder app)
+    {
+        return app.UseExceptionHandler(errorApp =>
+        {
+            errorApp.Run(async context =>
+            {
+                var feature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+                var logger = context.RequestServices
+                    .GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>()
+                    .CreateLogger("SwiftRide.ProblemDetails");
+
+                logger.LogError(feature?.Error, "Unhandled exception on {Method} {Path}",
+                    context.Request.Method, context.Request.Path);
+
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                context.Response.ContentType = "application/problem+json";
+
+                var traceId = Activity.Current?.TraceId.ToString() ?? "n/a";
+
+                await context.Response.WriteAsJsonAsync(new Microsoft.AspNetCore.Mvc.ProblemDetails
+                {
+                    Title = "Lỗi máy chủ",
+                    Detail = $"Yêu cầu không hoàn tất do lỗi hệ thống. Mã theo dõi: {traceId}.",
+                    Type = "https://httpstatuses.com/500",
+                    Status = StatusCodes.Status500InternalServerError,
+                    Instance = context.Request.Path
+                });
+            });
         });
     }
 }

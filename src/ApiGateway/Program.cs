@@ -58,6 +58,23 @@ builder.Services.AddRateLimiter(options =>
                 QueueLimit           = 0,
             }));
 
+    // GET /payments là đường polling của frontend (trạng thái thanh toán, refund) —
+    // trần 5/60s chỉ dành cho POST/PATCH; đọc phải rộng tay để không bị 429.
+    // Policy này CHỈ được route "payments-read" (Match.Methods = ["GET"]) tham chiếu;
+    // mọi method ghi khác vẫn đi qua route "payments-write" với policy "payment".
+    options.AddPolicy("payment-read", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.User.FindFirst("sub")?.Value
+                          ?? context.Connection.RemoteIpAddress?.ToString()
+                          ?? "anon",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit          = 60,
+                Window               = TimeSpan.FromSeconds(60),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit           = 0,
+            }));
+
     // Rate Limiter chống brute-force mật khẩu cổng Admin (5 req / 60s)
     options.AddPolicy("admin-login-rate", context =>
         RateLimitPartition.GetFixedWindowLimiter(

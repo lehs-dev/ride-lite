@@ -15,6 +15,9 @@ public class TripDbContext : DbContext
     public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<Trip> Trips => Set<Trip>();
+    public DbSet<TripStatusHistory> TripStatusHistories => Set<TripStatusHistory>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+    public DbSet<ProcessedEvent> ProcessedEvents => Set<ProcessedEvent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -166,6 +169,80 @@ public class TripDbContext : DbContext
                 .WithMany(p => p.RolePermissions)
                 .HasForeignKey(rp => rp.PermissionId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Trip
+        modelBuilder.Entity<Trip>(builder =>
+        {
+            builder.ToTable("Trips");
+            builder.HasKey(t => t.Id);
+
+            builder.Property(t => t.PickupAddress).IsRequired().HasMaxLength(256);
+            builder.Property(t => t.DestinationAddress).IsRequired().HasMaxLength(256);
+            builder.Property(t => t.Currency).IsRequired().HasMaxLength(3).HasDefaultValue("VND");
+            builder.Property(t => t.Status).HasConversion<short>();
+            builder.Property(t => t.PaymentRequestKey).HasMaxLength(128);
+            builder.Property(t => t.TransactionId).HasMaxLength(64);
+
+            builder.Property(t => t.PickupLatitude).HasPrecision(9, 6);
+            builder.Property(t => t.PickupLongitude).HasPrecision(9, 6);
+            builder.Property(t => t.DestinationLatitude).HasPrecision(9, 6);
+            builder.Property(t => t.DestinationLongitude).HasPrecision(9, 6);
+            builder.Property(t => t.EstimatedPrice).HasPrecision(18, 2);
+
+            // Optimistic lock: driver-accept/pickup đồng thời chỉ một request thắng.
+            builder.Property(t => t.RowVersion).IsRowVersion();
+
+            builder.HasIndex(t => new { t.RiderId, t.CreatedAtUtc });
+            builder.HasIndex(t => new { t.DriverId, t.Status });
+
+            // Một nghĩa vụ thanh toán duy nhất cho mỗi trip.
+            builder.HasIndex(t => t.PaymentRequestKey).IsUnique()
+                .HasFilter("[PaymentRequestKey] IS NOT NULL");
+        });
+
+        // TripStatusHistory (append-only)
+        modelBuilder.Entity<TripStatusHistory>(builder =>
+        {
+            builder.ToTable("TripStatusHistories");
+            builder.HasKey(h => h.Id);
+
+            builder.Property(h => h.FromStatus).HasConversion<short>();
+            builder.Property(h => h.ToStatus).HasConversion<short>();
+            builder.Property(h => h.ActorType).IsRequired().HasMaxLength(16);
+            builder.Property(h => h.Reason).HasMaxLength(256);
+
+            builder.HasOne(h => h.Trip)
+                .WithMany()
+                .HasForeignKey(h => h.TripId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasIndex(h => h.TripId);
+        });
+
+        // Outbox intent
+        modelBuilder.Entity<OutboxMessage>(builder =>
+        {
+            builder.ToTable("TripOutboxMessages");
+            builder.HasKey(m => m.Id);
+
+            builder.Property(m => m.EventType).IsRequired().HasMaxLength(128);
+            builder.Property(m => m.Payload).IsRequired();
+            builder.Property(m => m.LastError).HasMaxLength(1024);
+
+            builder.HasIndex(m => m.MessageId).IsUnique();
+            builder.HasIndex(m => m.OccurredAtUtc)
+                .HasFilter("[DeliveredAtUtc] IS NULL");
+        });
+
+        // Inbox dedup theo khóa nghiệp vụ
+        modelBuilder.Entity<ProcessedEvent>(builder =>
+        {
+            builder.ToTable("ProcessedEvents");
+            builder.HasKey(e => new { e.ConsumerName, e.BusinessKey });
+
+            builder.Property(e => e.ConsumerName).HasMaxLength(64);
+            builder.Property(e => e.BusinessKey).HasMaxLength(160);
         });
     }
 }
