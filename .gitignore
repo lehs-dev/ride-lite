@@ -3,3 +3,16 @@
 **/obj/
 .vs/
 .vscode/
+
+# Model API keys cho bộ multi-agent — không bao giờ commit
+.agents/secrets.env
+.agents/*.secret*
+
+# Scratch: log build/test, diff, prompt tạm — không commit
+tmp/
+
+# Python cache (script trong .agents/)
+__pycache__/
+
+# Build helper cá nhân: hardcode path máy + Docker — giữ local, không push
+scripts/dotnet.sh

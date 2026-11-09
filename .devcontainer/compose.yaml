@@ -18,6 +18,7 @@ services:
       RabbitMq__Host: rabbitmq
       RabbitMq__UserName: swiftdev
       RabbitMq__Password: "${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in .devcontainer/.env}"
+      PaymentReadModel__BaseUrl: http://payment-service:8080
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
     depends_on:
@@ -39,7 +40,7 @@ services:
       MSSQL_PID: Developer
       MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .devcontainer/.env}"
     ports:
-      - "127.0.0.1:1433:1433"
+      - "127.0.0.1:${MSSQL_HOST_PORT:-1433}:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
 

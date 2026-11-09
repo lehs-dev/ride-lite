@@ -73,14 +73,16 @@ Mỗi request khi đến Gateway (port `5000`) sẽ đi qua pipeline middleware 
 | `trips` | `/trips/{**catch-all}` | `trip` | `5001` (`trip-service:8080`) | `Authenticated` | `rider-booking` |
 | `matching` | `/match/{**catch-all}` | `matching` | `5002` (`matching-service:8080`) | `Authenticated` | `rider-booking` |
 | `quotes` | `/quote/{**catch-all}` | `matching` | `5002` (`matching-service:8080`) | `Authenticated` | `rider-booking` |
-| `payments` | `/payments/{**catch-all}` | `payment` | `5003` (`payment-service:8080`) | `Authenticated` | `payment` |
+| `payments-read` | `/payments/{**catch-all}` (chỉ `GET`) | `payment` | `5003` (`payment-service:8080`) | `Authenticated` | `payment-read` |
+| `payments-write` | `/payments/{**catch-all}` | `payment` | `5003` (`payment-service:8080`) | `Authenticated` | `payment` |
 
 *Ghi chú: Route `/health/live` trên Gateway cho phép gọi ẩn danh (`AllowAnonymous`).*
 
 ### Quy tắc Rate Limit
 
 - **`rider-booking`**: Tối đa **10 requests / 10 giây**. Phân vùng theo `sub` (User ID trong token), nếu chưa đăng nhập fallback theo IP client. Hàng đợi (Queue) = 0.
-- **`payment`**: Tối đa **5 requests / 60 giây**. Phân vùng theo `sub` (User ID trong token). Hàng đợi = 0.
+- **`payment`**: Tối đa **5 requests / 60 giây** cho POST/PATCH (`/payments` write). Phân vùng theo `sub` (User ID trong token). Hàng đợi = 0.
+- **`payment-read`**: Tối đa **60 requests / 60 giây** cho GET `/payments/**` — frontend polling trạng thái thanh toán không bị 429.
 - **`admin-login-rate`**: Tối đa **5 requests / 60 giây** trên mỗi IP kết nối. Chống brute-force mật khẩu quản trị.
 - **`admin-dashboard-rate`**: Tối đa **100 requests / 10 giây** phân vùng theo `sub` của Admin. Hàng đợi = 10. Phục vụ dashboard tải báo cáo và biểu đồ.
 - **Global Limiter**: Tối đa **30 requests / 10 giây** trên mỗi IP kết nối. Hàng đợi = 2.

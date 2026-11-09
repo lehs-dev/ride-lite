@@ -9,6 +9,9 @@ namespace TripService.Application.Services;
 
 public class AuthService : IAuthService
 {
+    /// <summary>Những role được phép tự nhận khi đăng ký công khai.</summary>
+    private static readonly string[] SelfRegistrableRoles = ["Rider", "Driver"];
+
     private readonly TripDbContext _db;
     private readonly ITokenService _tokenService;
 
@@ -117,11 +120,18 @@ public class AuthService : IAuthService
         if (await _db.Users.AnyAsync(u => u.Email == request.Email))
             throw new InvalidOperationException($"Email '{request.Email}' đã được đăng ký.");
 
-        var roleName = string.IsNullOrWhiteSpace(request.Role) ? "Rider" : request.Role.Trim();
+        // Tự đăng ký chỉ được nhận role Rider/Driver. Trước đây request.Role được tra thẳng
+        // vào DB, nên ai cũng có thể POST {"role":"Admin"} rồi vào /admin/payments, /admin/users.
+        // Gán Admin chỉ đi qua đường quản trị role (roles.manage / users.manage).
+        var requestedRole = request.Role?.Trim() ?? string.Empty;
+        var roleName = SelfRegistrableRoles.Any(r => string.Equals(r, requestedRole, StringComparison.OrdinalIgnoreCase))
+            ? requestedRole
+            : "Rider";
+
         var role = await _db.Roles
             .Include(r => r.RolePermissions)
                 .ThenInclude(rp => rp.Permission)
-            .FirstOrDefaultAsync(r => r.Name.ToLower() == roleName.ToLower());
+            .FirstOrDefaultAsync(r => r.Name == roleName);
 
         if (role == null)
         {
